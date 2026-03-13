@@ -105,13 +105,10 @@ export const findOwnerTextPair = (
  * ```
  *
  * @example
- * Group tables by position:
- * ```tsx
- * const tables = [
- *   { pos: 5, nodeSize: 20, /* ... */ },
- *   { pos: 25, nodeSize: 15, /* ... */ }
- * ];
- * const tableGroups = groupConsecutiveItems(tables);
+ * Group items by position:
+ * ```typescript
+ * const items = [{ pos: 5, nodeSize: 20 }, { pos: 25, nodeSize: 15 }];
+ * const groups = groupConsecutiveItems(items);
  * ```
  */
 export const groupConsecutiveItems = <T extends { pos: number; nodeSize: number }>(
