@@ -1,7 +1,9 @@
 // src/types/editor.types.ts
 import { RefObject } from 'react';
-import { Editor } from '@tiptap/react';
 import { DiffRange, DiffPair } from './diff.types';
+
+// TipTap Editor type (use any to avoid import issues)
+type Editor = any;
 
 export interface BlogSimpleEditorRef {
   getEditor: () => Editor | null;

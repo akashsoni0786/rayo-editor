@@ -1,0 +1,8 @@
+__tests__
+src
+*.config.ts
+tsconfig.json
+.gitignore
+.eslintignore
+node_modules
+.DS_Store
