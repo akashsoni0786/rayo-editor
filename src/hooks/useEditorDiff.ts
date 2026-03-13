@@ -47,19 +47,8 @@ import { DiffPair } from '@/types/diff.types';
  *   setHoverPairIndex
  * } = useEditorDiff(editorRef);
  *
- * return (
- *   <div
- *     onMouseMove={(e) => {
- *       const pair = diffPairs[0];
- *       if (pair && isWithinBounds(e, pair)) {
- *         setHoverPairIndex(0);
- *       }
- *     }}
- *     onClick={() => setActivePairIndex(0)}
- *   >
- *     {/* content */}
- *   </div>
- * );
+ * // Use diffPairs to render interactive UI elements
+ * // with hover and click handlers
  * ```
  */
 export const useEditorDiff = (_editorRef: any, _options?: { focusMode?: boolean }) => {
