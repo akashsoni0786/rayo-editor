@@ -1,4 +1,3 @@
-export { RayoEditor } from './RayoEditor';
 export { BlogEditor } from './BlogEditor';
 export { TitleTextarea } from './TitleTextarea';
 export { DiffOverlay } from './DiffOverlay';

@@ -1,0 +1,1 @@
+{"version":3,"file":"DeletionMark.d.ts","sourceRoot":"","sources":["../../../src/extensions/DiffMarks/DeletionMark.ts"],"names":[],"mappings":"AAAA;;GAEG;AAEH,OAAO,EAAE,IAAI,EAAmB,MAAM,cAAc,CAAC;AAErD,MAAM,WAAW,mBAAmB;IAClC,cAAc,EAAE,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,CAAC;CACrC;AAED,eAAO,MAAM,YAAY,gCAwEvB,CAAC"}

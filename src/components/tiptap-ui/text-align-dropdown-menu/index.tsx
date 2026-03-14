@@ -1,0 +1,1 @@
+export { TextAlignDropdownMenu, type TextAlignDropdownMenuProps } from "./text-align-dropdown-menu"

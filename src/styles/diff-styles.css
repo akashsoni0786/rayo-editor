@@ -1,0 +1,301 @@
+/**
+ * Simple and Clean Diff Styles for htmldiff-js
+ * Works with <ins> and <del> tags
+ */
+
+/* Insertions - Content Added (Green) */
+ins,
+ins.diffins {
+  background-color: #D5F6E7 !important; /* Light green background */
+  text-decoration: none !important; /* No underline */
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+ins:hover {
+  background-color: #D5F6E7 !important;
+  cursor: text;
+}
+
+/* Deletions - Content Removed (Red) */
+del,
+del.diffdel {
+  background-color: #FCE7E4 !important; /* More visible red background */
+  text-decoration: line-through !important; /* Strike through */
+  color: #FCE7E4 !important; /* Bright red text */
+  text-decoration-color: #FCE7E4 !important;
+  text-decoration-thickness: 2px !important;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+  opacity: 1 !important;
+}
+
+del:hover {
+  background-color: #f99fae !important;
+  opacity: 1;
+  cursor: text;
+}
+
+/* Modifications - Changed content (Yellow) */
+ins.diffmod,
+del.diffmod {
+  background-color: #ffffcc !important; /* Light yellow background */
+  color: black;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Ensure visibility in TipTap/ProseMirror editor - MORE SPECIFIC */
+.ProseMirror ins,
+.ProseMirror ins.diffins,
+.tiptap ins,
+.tiptap ins.diffins,
+.editor-content ins,
+div[contenteditable] ins {
+  background-color: #d4fcbc !important;
+  text-decoration: none !important;
+  color: black !important;
+  display: inline !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+}
+
+.ProseMirror del,
+.ProseMirror del.diffdel,
+.tiptap del,
+.tiptap del.diffdel,
+.editor-content del,
+div[contenteditable] del {
+  background-color: #ff9999 !important; /* BRIGHT RED for maximum visibility */
+  text-decoration: line-through !important;
+  color: #ff9999 !important; /* Bright red text */
+  display: inline !important;
+  text-decoration-color: #ff9999 !important;
+  text-decoration-thickness: 2px !important;
+  padding: 2px 4px !important;
+  border-radius: 3px !important;
+  font-weight: 600 !important;
+}
+
+/* Special handling for headings with diffs */
+h1 ins, h2 ins, h3 ins, h4 ins, h5 ins, h6 ins,
+h1 del, h2 del, h3 del, h4 del, h5 del, h6 del {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+/* Animation for diff appearance - disabled to prevent image reload issues */
+/* @keyframes diffHighlight {
+  from {
+    background-color: #ffeb3b;
+    transform: scale(1.05);
+  }
+  to {
+    background-color: inherit;
+    transform: scale(1);
+  }
+}
+
+ins, del {
+  animation: diffHighlight 0.5s ease-out;
+} */
+
+/* Tooltips are now handled via JavaScript in VersionComparisonExtension.ts */
+/* The CSS ::after tooltip has been removed to prevent duplicate tooltips */
+/* See: src/extensions/VersionComparison/VersionComparisonExtension.ts */
+
+/* Make sure nested elements inherit the right styles — but NOT del inside ins or vice versa */
+ins *:not(del):not(ins), del *:not(ins):not(del) {
+  background-color: inherit !important;
+  color: inherit !important;
+  text-decoration: inherit !important;
+}
+
+/* When del is nested inside ins (or vice versa), ensure del keeps red styling */
+ins del,
+ins del.diffdel,
+ins del[data-diff="deletion"] {
+  background-color: #FEE2E2 !important;
+  color: #991B1B !important;
+  text-decoration: line-through !important;
+  text-decoration-color: #991B1B !important;
+  text-decoration-thickness: 2px !important;
+  cursor: text !important;
+}
+
+del ins,
+del ins.diffins,
+del ins[data-diff="insertion"] {
+  background-color: #DCFCE7 !important;
+  color: #14532D !important;
+  text-decoration: none !important;
+  cursor: text !important;
+}
+
+/* ULTRA SPECIFIC - Target any possible container */
+* del,
+* del.diffdel,
+body del,
+div del,
+p del,
+span del,
+[class*="editor"] del,
+[class*="Editor"] del,
+[class*="tiptap"] del,
+[class*="TipTap"] del,
+[class*="prose"] del,
+[contenteditable="true"] del,
+[contenteditable="false"] del {
+  background-color: #ff9999 !important; /* VERY BRIGHT RED */
+  color: #ffffff !important; /* White text on red background */
+  text-decoration: line-through !important;
+  text-decoration-color: #ffffff !important;
+  text-decoration-thickness: 2px !important;
+  padding: 3px 6px !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
+  display: inline !important;
+  opacity: 1 !important;
+}
+
+/* Also target ins tags with maximum specificity */
+* ins,
+* ins.diffins,
+body ins,
+div ins,
+p ins,
+span ins,
+[class*="editor"] ins,
+[class*="Editor"] ins,
+[class*="tiptap"] ins,
+[class*="TipTap"] ins,
+[class*="prose"] ins,
+[contenteditable="true"] ins,
+[contenteditable="false"] ins {
+  background-color: #66ff66 !important; /* BRIGHT GREEN */
+  color: black !important; /* Dark green text */
+  text-decoration: none !important;
+  padding: 3px 6px !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
+  display: inline !important;
+  opacity: 1 !important;
+}
+
+/* ============================================================================
+   HIDE DIFFS - When version control / review panel is NOT open
+   These rules override all above styles when .hide-diffs is on the container.
+   ins (additions) → render as normal text (no highlight)
+   del (deletions) → hidden completely
+   ============================================================================ */
+
+.hide-diffs ins,
+.hide-diffs ins.diffins,
+.hide-diffs ins.diffmod,
+.hide-diffs ins[data-diff],
+.hide-diffs ins[data-diff="insertion"],
+.hide-diffs .ProseMirror ins,
+.hide-diffs .ProseMirror ins[data-diff="insertion"],
+.hide-diffs .tiptap ins,
+.hide-diffs .editor-content ins,
+.hide-diffs [contenteditable] ins,
+.hide-diffs p ins,
+.hide-diffs div ins,
+.hide-diffs span ins,
+.hide-diffs h1 ins,
+.hide-diffs h2 ins,
+.hide-diffs h3 ins,
+.hide-diffs h4 ins,
+.hide-diffs h5 ins,
+.hide-diffs h6 ins {
+  background-color: transparent !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  font-weight: inherit !important;
+  display: inline !important;
+  opacity: 1 !important;
+  cursor: text !important;
+}
+
+.hide-diffs ins *,
+.hide-diffs ins.diffins *,
+.hide-diffs ins[data-diff] * {
+  background-color: transparent !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.hide-diffs del,
+.hide-diffs del.diffdel,
+.hide-diffs del.diffmod,
+.hide-diffs del[data-diff],
+.hide-diffs del[data-diff="deletion"],
+.hide-diffs .ProseMirror del,
+.hide-diffs .ProseMirror del[data-diff="deletion"],
+.hide-diffs .tiptap del,
+.hide-diffs .editor-content del,
+.hide-diffs [contenteditable] del,
+.hide-diffs p del,
+.hide-diffs div del,
+.hide-diffs span del,
+.hide-diffs h1 del,
+.hide-diffs h2 del,
+.hide-diffs h3 del,
+.hide-diffs h4 del,
+.hide-diffs h5 del,
+.hide-diffs h6 del {
+  display: none !important;
+}
+
+.hide-diffs del *,
+.hide-diffs del.diffdel *,
+.hide-diffs del[data-diff] * {
+  display: none !important;
+}
+
+/* ============================================================================
+   PARENT-LEVEL COMPARISON BACKGROUND (CSS-only via :has())
+   For headings containing links: green bg on the NEW heading that follows
+   an OLD heading (which has red highlight marks). No DOM manipulation needed.
+   Marks inside <a> tags cause character clipping, so marks are skipped for
+   these headings and this CSS provides the green background instead.
+   ============================================================================ */
+
+/* New heading with links (no marks) following old heading (has red marks).
+   ALL marks are skipped in link headings to prevent character clipping.
+   display:inline + box-decoration-break:clone wraps bg per line. */
+.ProseMirror :is(h1, h2, h3, h4, h5, h6):has(mark[data-color="#fecaca"]) + :is(h1, h2, h3, h4, h5, h6, p):has(a):not(:has(mark)) {
+  background-color: #D5F6E7 !important;
+  border-radius: 4px !important;
+  padding: 3px 6px !important;
+  display: inline !important;
+  box-decoration-break: clone !important;
+  -webkit-box-decoration-break: clone !important;
+}
+/* Account for possible empty paragraph between old and new headings */
+.ProseMirror :is(h1, h2, h3, h4, h5, h6):has(mark[data-color="#fecaca"]) + :empty + :is(h1, h2, h3, h4, h5, h6, p):has(a):not(:has(mark)) {
+  background-color: #D5F6E7 !important;
+  border-radius: 4px !important;
+  padding: 3px 6px !important;
+  display: inline !important;
+  box-decoration-break: clone !important;
+  -webkit-box-decoration-break: clone !important;
+}
+
+/* Hide green bg when diffs panel is closed */
+.hide-diffs :is(h1, h2, h3, h4, h5, h6):has(mark[data-color="#fecaca"]) + :is(h1, h2, h3, h4, h5, h6, p):has(a):not(:has(mark)),
+.hide-diffs :is(h1, h2, h3, h4, h5, h6):has(mark[data-color="#fecaca"]) + :empty + :is(h1, h2, h3, h4, h5, h6, p):has(a):not(:has(mark)) {
+  background-color: transparent !important;
+  display: block !important;
+}

@@ -1,0 +1,89 @@
+/* Font Family Dropdown Menu Styles */
+
+/* Dropdown trigger button */
+.font-family-dropdown-trigger {
+  min-width: 120px;
+  max-width: 160px;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .font-family-label {
+    flex: 1;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.875rem;
+  }
+}
+
+/* Dropdown content with proper scrolling */
+.tiptap-dropdown-menu.font-family-dropdown-content {
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0.25rem !important;
+
+  /* Target the button group that contains the font options */
+  .tiptap-button-group {
+    max-height: 290px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    /* Custom scrollbar styling for WebKit browsers */
+    &::-webkit-scrollbar {
+      width: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--tt-scrollbar-color, #d1d5db);
+      border-radius: 0.25rem;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: var(--tt-gray-light-500, #999);
+    }
+
+    /* Firefox scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--tt-scrollbar-color, #d1d5db) transparent;
+  }
+}
+
+/* Font family option styling */
+.font-family-option {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  flex-shrink: 0;
+
+  .font-family-option-label {
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Dark mode support */
+.dark .tiptap-dropdown-menu.font-family-dropdown-content {
+  .tiptap-button-group {
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--tt-scrollbar-color, #4a5568);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: var(--tt-gray-dark-400, #718096);
+    }
+
+    scrollbar-color: var(--tt-scrollbar-color, #4a5568) transparent;
+  }
+}

@@ -17,7 +17,10 @@ export default defineConfig({
       }
     },
     rollupOptions: {
-      external: ['react', 'react-dom', '@tiptap/react'],
+      external: (id) => {
+        // Only externalize true peer dependencies
+        return id === 'react' || id === 'react-dom' || id === 'react/jsx-runtime';
+      },
       output: {
         globals: {
           react: 'React',

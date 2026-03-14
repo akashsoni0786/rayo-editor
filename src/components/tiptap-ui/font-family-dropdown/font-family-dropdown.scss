@@ -1,0 +1,197 @@
+/* Font Family Dropdown Styles */
+.font-family-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.font-family-trigger {
+  min-width: 120px;
+  max-width: 160px;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  .font-family-label {
+    flex: 1;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.875rem;
+  }
+}
+
+.font-family-dropdown {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 0.5rem);
+  background: var(--tt-toolbar-bg-color);
+  border: 1px solid var(--tt-toolbar-border-color);
+  border-radius: 0.5rem;
+  box-shadow: var(--tt-shadow-elevated-lg);
+  z-index: 50;
+  min-width: 240px;
+  max-width: 280px;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fadeInScale 0.15s ease-out;
+}
+
+/* Search Container */
+.font-search-container {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--tt-border-color);
+}
+
+.font-search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--tt-border-color);
+  border-radius: 0.375rem;
+  background: var(--tt-bg-color);
+  color: var(--tt-theme-text);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &:focus {
+    border-color: var(--tt-brand-color-500);
+    box-shadow: 0 0 0 2px rgba(98, 41, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: var(--tt-gray-light-500, #999);
+  }
+}
+
+/* Font Options Container */
+.font-options-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.25rem;
+
+  &::-webkit-scrollbar {
+    width: 0.375rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--tt-scrollbar-color, #d1d5db);
+    border-radius: 0.1875rem;
+  }
+
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--tt-scrollbar-color, #d1d5db) transparent;
+}
+
+/* Font Category */
+.font-category {
+  margin-bottom: 0.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.font-category-label {
+  padding: 0.5rem 0.75rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--tt-gray-light-500, #999);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Font Option */
+.font-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  color: var(--tt-theme-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+  font-size: 0.875rem;
+  line-height: 1.25;
+
+  &:hover {
+    background: var(--tt-hover-bg-color);
+    color: var(--tt-brand-color-500);
+  }
+
+  &.is-active {
+    background: var(--tt-brand-color-100);
+    color: var(--tt-brand-color-600);
+    font-weight: 500;
+  }
+
+  .font-option-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .font-option-check {
+    margin-left: 0.5rem;
+    color: var(--tt-brand-color-500);
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+}
+
+/* Dark mode support */
+.dark .font-family-dropdown {
+  background: var(--tt-toolbar-bg-color);
+  border-color: var(--tt-toolbar-border-color);
+}
+
+.dark .font-search-input {
+  background: var(--tt-bg-color);
+  border-color: var(--tt-border-color);
+  color: var(--tt-theme-text);
+
+  &:focus {
+    border-color: var(--tt-brand-color-400);
+  }
+}
+
+.dark .font-option {
+  color: var(--tt-theme-text);
+
+  &:hover {
+    background: var(--tt-hover-bg-color);
+    color: var(--tt-brand-color-400);
+  }
+
+  &.is-active {
+    background: var(--tt-brand-color-900);
+    color: var(--tt-brand-color-300);
+  }
+
+  .font-option-check {
+    color: var(--tt-brand-color-400);
+  }
+}
+
+/* Animation */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

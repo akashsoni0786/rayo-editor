@@ -1,0 +1,105 @@
+// Animated toolbar with proper overflow handling for scaling buttons
+.tiptap-toolbar {
+  // Allow buttons to scale beyond toolbar bounds
+  overflow: visible !important;
+  
+  // Ensure toolbar groups allow overflow
+  .tiptap-toolbar-group {
+    overflow: visible !important;
+    position: relative;
+    
+    // Animated button wrappers
+    > div {
+      transform-origin: bottom center;
+      will-change: transform;
+      position: relative;
+      z-index: 1;
+      
+      // When scaling, bring to front
+      &:hover {
+        z-index: 10;
+      }
+    }
+    
+    // Ensure buttons maintain proper interaction
+    button, [role="button"], .tiptap-button {
+      position: relative;
+      transition: none !important; // Let Framer Motion handle
+      will-change: transform;
+      
+      &:hover {
+        z-index: 10;
+      }
+    }
+  }
+  
+  // For floating variant, ensure proper overflow
+  &[data-variant="floating"] {
+    padding-top: 1rem; // Extra space for scaling up
+    padding-bottom: 0.5rem;
+    overflow: visible !important;
+    
+    .tiptap-toolbar-group {
+      align-items: flex-end; // Align to bottom for upward scaling
+    }
+  }
+  
+  // For fixed variant
+  &[data-variant="fixed"] {
+    padding-top: 1rem; // Extra space for scaling up
+    padding-bottom: 0.75rem;
+    overflow: visible !important;
+    align-items: flex-end;
+    
+    .tiptap-toolbar-group {
+      align-items: flex-end;
+      min-height: var(--tt-toolbar-height, 44px);
+    }
+    
+    @media (max-width: 480px) {
+      padding-top: 1rem;
+      padding-bottom: calc(0.75rem + var(--tt-safe-area-bottom, 0px));
+    }
+  }
+}
+
+// Ensure animated buttons can overflow their containers
+.animated-toolbar-group {
+  overflow: visible !important;
+  
+  // Individual animated button wrapper
+  > div {
+    overflow: visible !important;
+    transform-origin: bottom center;
+    
+    // Ensure proper stacking when scaling
+    &:hover {
+      z-index: 15 !important;
+      position: relative;
+    }
+  }
+}
+
+// Special handling for blog editor floating toolbar
+.blog-simple-editor-container {
+  .tiptap-toolbar {
+    overflow: visible !important;
+    
+    // Ensure the toolbar container doesn't clip
+    &[data-variant="floating"] {
+      overflow: visible !important;
+      padding-top: 1.5rem; // More space for blog editor
+      
+      .tiptap-toolbar-group {
+        overflow: visible !important;
+      }
+    }
+  }
+}
+
+// Accessibility: Reduce motion for users who prefer it
+@media (prefers-reduced-motion: reduce) {
+  .tiptap-toolbar .tiptap-toolbar-group > div {
+    will-change: auto !important;
+  }
+}

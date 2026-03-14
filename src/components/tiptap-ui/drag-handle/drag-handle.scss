@@ -1,0 +1,140 @@
+/* Drag Handle Styles */
+
+.drag-handle-container {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+  pointer-events: auto;
+
+  /* Show when parent .content-wrapper is hovered */
+  .content-wrapper:hover &,
+  &:hover {
+    opacity: 1;
+  }
+
+  &.is-dragging {
+    opacity: 0.5;
+  }
+}
+
+.drag-handle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #374151;
+  }
+
+  &:active {
+    background: #d1d5db;
+  }
+}
+
+.drag-handle-grip {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.drag-handle-add {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  .drag-handle-container:hover & {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Dropdown menu styles for drag handle */
+.drag-handle-container {
+  [data-radix-popper-content-wrapper] {
+    z-index: 100 !important;
+  }
+
+  [role="menu"] {
+    min-width: 160px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 10px 38px -10px rgba(22, 23, 24, 0.35),
+                0 10px 20px -15px rgba(22, 23, 24, 0.2);
+  }
+
+  [role="menuitem"] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #374151;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.1s ease;
+
+    &:hover,
+    &:focus {
+      background: #f3f4f6;
+    }
+
+    svg {
+      color: #6b7280;
+    }
+
+    &[data-highlighted] {
+      background: #f3f4f6;
+    }
+  }
+}
+
+/* Drop indicator line */
+.ProseMirror-dropcursor {
+  border-left: 2px solid #1A8D67 !important;
+  border-top: none !important;
+  margin-left: 0 !important;
+}
+
+/* Dragging state for nodes */
+.ProseMirror {
+  &.dragging {
+    .ProseMirror-selectednode {
+      opacity: 0.4;
+      outline: 2px dashed #1A8D67;
+    }
+  }
+}
+
+/* Drop target highlight */
+[data-drop-target="true"] {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -2px;
+    height: 2px;
+    background: #1A8D67;
+    border-radius: 1px;
+  }
+}

@@ -1,0 +1,408 @@
+// Image view - matches the reference design
+.image-view {
+  display: inline-block;
+  float: none;
+  max-width: 100%;
+  line-height: 0;
+  vertical-align: baseline;
+  user-select: none;
+  position: relative;
+  // Removed contain: layout style — it clips the absolute-positioned toolbar overlay
+  isolation: isolate;
+  // Add padding to ensure outline is visible on all sides
+  padding: 3px;
+  margin: -3px;
+
+  // Green boundary for pending insert images
+  // IMPORTANT: Only visual-only properties (outline, background) are changed.
+  // Layout properties (padding, margin, contain, etc.) stay identical to base .image-view
+  // so the image renders at the EXACT same size before and after acceptance.
+  &--pending-insert {
+    margin-top: 5px !important;
+
+    // Remove the ::before pseudo-element
+    &::before {
+      display: none !important;
+    }
+
+    // Remove the internal green overlay since we use outline on body
+    .image-view__body__overlay--insert {
+      display: none !important;
+    }
+
+    // Green border on the body - uses box-shadow + outline (no layout impact, image doesn't shrink)
+    .image-view__body {
+      // 10px green fill around image, then 3px border outside
+      box-shadow: 0 0 0 10px #D5F6E7 !important;
+      outline: 3px solid #167858 !important;
+      outline-offset: 10px;
+      // Margin so the shadow/outline don't overlap adjacent content
+      margin: 13px !important;
+
+      &:hover {
+        box-shadow: 0 0 0 10px #D5F6E7 !important;
+      }
+    }
+
+    // Hide toolbar when in pending state
+    .image-toolbar {
+      display: none;
+    }
+  }
+
+  // Red boundary for pending delete images
+  // Same principle: only visual-only properties changed, layout stays identical to base.
+  &--pending-delete {
+    margin-bottom: 5px !important;
+
+    // Remove the ::before pseudo-element
+    &::before {
+      display: none !important;
+    }
+
+    // Remove the internal red overlay since we use outline on body
+    .image-view__body__overlay--delete {
+      display: none !important;
+    }
+
+    // Red border on the body - uses box-shadow + outline (no layout impact, image doesn't shrink)
+    .image-view__body {
+      // 10px red fill around image, then 3px border outside
+      box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.15) !important;
+      outline: 3px solid #EF4444 !important;
+      outline-offset: 10px;
+      // Margin so the shadow/outline don't overlap adjacent content
+      margin: 13px !important;
+
+      &:hover {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.15) !important;
+      }
+    }
+
+    // Hide empty caption in delete state
+    .image-caption:empty {
+      display: none;
+    }
+
+    // Hide toolbar when in pending state
+    .image-toolbar {
+      display: none;
+    }
+  }
+
+  &__body {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    clear: both;
+    // Use box-shadow instead of outline for better visibility on all sides
+    box-shadow: 0 0 0 2px transparent;
+    transition: box-shadow 0.2s ease-in;
+    // Ensure visibility
+    contain: none;
+    overflow: visible;
+    z-index: 1;
+
+    &:hover {
+      box-shadow: 0 0 0 2px #ffc83d;
+    }
+
+    &--focused,
+    &--focused:hover {
+      box-shadow: 0 0 0 2px var(--tt-primary-color, #007bff);
+    }
+
+    &--resizing,
+    &--resizing:hover {
+      box-shadow: 0 0 0 2px var(--tt-primary-color, #007bff);
+    }
+
+    &__image {
+      margin: 0;
+      cursor: pointer !important;
+      display: block;
+      // Prevent image reload on re-renders - GPU acceleration
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+      // Isolate from parent repaints
+      contain: strict;
+    }
+
+    // Overlays for pending states
+    &__overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+
+      &--delete {
+        background-color: rgba(254, 202, 202, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &--insert {
+        background-color: rgba(199, 240, 214, 0.5);
+        border: 3px solid #22c55e;
+        box-sizing: border-box;
+      }
+
+      &__line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background-color: #ef4444;
+        transform: rotate(-5deg);
+        opacity: 0.8;
+      }
+    }
+  }
+
+  img {
+    display: inline;
+    vertical-align: baseline;
+  }
+}
+
+// Image resizer - corner handles
+.image-resizer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--tt-border-color, #e5e7eb);
+
+  &__handler {
+    position: absolute;
+    z-index: 2;
+    box-sizing: border-box;
+    display: block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #fff;
+    border-radius: 2px;
+    background-color: #000;
+
+    &--tl {
+      top: -6px;
+      left: -6px;
+      cursor: nw-resize;
+    }
+
+    &--tr {
+      top: -6px;
+      right: -6px;
+      cursor: ne-resize;
+    }
+
+    &--bl {
+      bottom: -6px;
+      left: -6px;
+      cursor: sw-resize;
+    }
+
+    &--br {
+      right: -6px;
+      bottom: -6px;
+      cursor: se-resize;
+    }
+  }
+}
+
+// Image caption
+.image-caption {
+  text-align: center;
+  margin-top: 8px;
+  line-height: 1.4;
+  min-height: 20px;
+
+
+  &__text {
+    display: inline-block;
+    font-size: 14px;
+    color: #6b7280;
+    font-style: italic;
+    padding: 4px 8px;
+    border-radius: 4px;
+
+    &--editable {
+      cursor: text;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background: #f3f4f6;
+      }
+    }
+  }
+
+  &__input {
+    width: 100%;
+    max-width: 400px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-style: italic;
+    color: #374151;
+    text-align: center;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+      border-color: var(--tt-primary-color, #007bff);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+}
+
+// Overlay container for caption placeholder + toolbar — absolute, no layout shift
+.image-tools-overlay {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 50;
+  margin-top: 4px;
+  animation: imageCaptionFadeIn 0.5s ease-out;
+  pointer-events: none;
+
+  .image-caption {
+    margin-top: 0;
+    pointer-events: auto;
+  }
+
+  .image-toolbar {
+    position: static;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin-top: 4px;
+    animation: none;
+    pointer-events: auto;
+  }
+}
+
+// Bottom toolbar - shown when image is selected (overlay, no layout shift)
+.image-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 8px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: fit-content;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 8px;
+  z-index: 50;
+  background-color: #ffffff !important;
+  animation: imageToolFadeIn 0.5s ease-out;
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    &.is-active {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    // Text buttons (S, M, L)
+    &--text {
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+    }
+
+    // Danger button (delete)
+    &--danger {
+      color: #6b7280;
+
+      &:hover {
+        background: #fef2f2;
+        color: #dc2626;
+      }
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  // Drag handle button
+  &__drag {
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  // Divider between button groups
+  &__divider {
+    width: 1px;
+    height: 20px;
+    background: #e5e7eb;
+    margin: 0 4px;
+  }
+}
+
+// Fade-in + slide-up animation for toolbar (has translateX(-50%))
+@keyframes imageToolFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+// Fade-in + slide-up animation for caption placeholder
+@keyframes imageCaptionFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

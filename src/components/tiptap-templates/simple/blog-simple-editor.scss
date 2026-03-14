@@ -1,0 +1,1618 @@
+/* Use Inter font for blog editor */
+
+// Import TipTap variables and styles
+@use "../styles/variables";
+@use "../styles/keyframe-animations";
+
+.blog-simple-editor-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--tt-bg-color, #ffffff);
+  
+  
+  // Allow animated toolbar buttons to overflow properly
+  overflow: visible;
+  
+  // Ensure the toolbar can overflow the container
+  .tiptap-toolbar {
+    overflow: visible !important;
+    position: relative; // Ensure proper positioning context for dialogs
+    
+    // Enhanced scrolling for toolbars with many items
+    &::-webkit-scrollbar {
+      display: none; // Hide scrollbar but keep functionality
+    }
+    
+    scrollbar-width: none; // Firefox
+    -ms-overflow-style: none; // IE/Edge
+    
+    // Smooth scrolling behavior
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    
+    // Drag state styling
+    &.is-dragging {
+      scroll-behavior: auto; // Disable smooth scrolling during drag
+      cursor: grabbing !important;
+      user-select: none !important;
+      
+      // Disable button interactions while dragging
+      button, [role="button"], .tiptap-button {
+        pointer-events: none !important;
+      }
+      
+      // But keep spacer areas interactive for dragging
+      .tiptap-spacer {
+        pointer-events: auto !important;
+        cursor: grabbing !important;
+      }
+    }
+    
+    // Enhanced spacer areas for dragging
+    .tiptap-spacer {
+      min-width: 20px; // Ensure spacers have enough drag area
+      cursor: grab;
+      position: relative;
+      
+      // Visual hint on hover (subtle)
+      &:hover {
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 4px;
+      }
+      
+      // Make spacers more prominent when toolbar is scrollable
+      &.scrollable-spacer {
+        min-width: 30px;
+        background: rgba(0, 0, 0, 0.01);
+        
+        &:hover {
+          background: rgba(0, 0, 0, 0.03);
+        }
+        
+        // Add subtle drag indicator
+        &::after {
+          content: '⋯';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          opacity: 0.3;
+          font-size: 12px;
+          pointer-events: none;
+        }
+      }
+    }
+    
+    // Extra padding for animated buttons
+    &[data-variant="floating"] {
+      padding-top: 0.5rem !important;
+      padding-bottom: 0.5rem !important;
+      overflow-y: visible !important;
+      
+      // Enhanced scrollable state
+      &.scrollable {
+        overflow-x: auto;
+        cursor: grab;
+        
+        &:active {
+          cursor: grabbing;
+        }
+      }
+      
+      .tiptap-toolbar-group {
+        overflow: visible !important;
+        align-items: flex-end;
+        flex-shrink: 0; // Prevent compression during scroll
+        
+        // Smooth transitions for groups
+        transition: transform 0.1s ease-out;
+      }
+    }
+  }
+}
+
+.blog-simple-editor-container .content-wrapper {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  position: relative;
+  scroll-behavior: smooth; // Enable smooth scrolling for auto-scroll functionality
+  
+  // Enhanced smooth scrolling optimizations
+  -webkit-overflow-scrolling: touch; // iOS momentum scrolling
+  scroll-snap-type: none; // Disable snap during streaming for smooth auto-scroll
+  overscroll-behavior: contain; // Prevent scroll chaining
+  
+  // GPU acceleration for smoother scrolling and typing animations
+  will-change: scroll-position, transform;
+  transform: translateZ(0); // Force hardware acceleration
+  backface-visibility: hidden; // Optimize rendering
+  
+  // Enhanced scroll behavior during streaming
+  &[data-streaming="true"] {
+    scroll-behavior: auto; // Use custom smooth scrolling during streaming
+    scroll-snap-type: none; // Disable snap completely during streaming
+  }
+
+  &::-webkit-scrollbar {
+    display: none; // Hide scrollbar completely
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--tt-scrollbar-color, #d1d5db);
+    border-radius: 4px;
+  }
+
+  /* Firefox scrollbar */
+  scrollbar-width: none; // Hide scrollbar in Firefox
+  scrollbar-color: var(--tt-scrollbar-color, #d1d5db) transparent;
+}
+
+.blog-simple-editor-container .simple-editor-content {
+  height: 100%;
+  width: 100%;
+}
+
+.blog-simple-editor-container .simple-editor-content .tiptap.ProseMirror {
+  
+  font-variant-numeric: slashed-zero;
+  position: relative;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  outline: none;
+  padding: 2rem;
+  min-height: 100%;
+  
+  /* Enhanced smooth rendering and scrolling */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility; // Better text rendering
+  
+  // GPU acceleration for smoother interactions
+  will-change: contents;
+  transform: translate3d(0, 0, 0); // Force GPU layer
+  -webkit-transform-style: preserve-3d;
+  
+  // Smooth transitions for text interactions (excluding layout-affecting properties like width/height/padding)
+  transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Enhanced typing animation during streaming with auto-scroll support */
+  &[data-streaming="true"] {
+    // Optimize rendering for smooth typing and scrolling
+    contain: layout style;
+    
+    p, h1, h2, h3, h4, h5, h6, li, blockquote, table, ul, ol {
+      animation: typeInText 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+      
+      // Ensure newly added content triggers auto-scroll
+      scroll-margin-bottom: 100px;
+    }
+    
+    /* Faster, smoother staggered animation optimized for auto-scroll */
+    p:nth-child(1) { animation-delay: 0.05s; }
+    p:nth-child(2) { animation-delay: 0.1s; }
+    p:nth-child(3) { animation-delay: 0.15s; }
+    p:nth-child(4) { animation-delay: 0.2s; }
+    p:nth-child(5) { animation-delay: 0.25s; }
+    p:nth-child(n+6) { animation-delay: 0.3s; }
+    
+    /* Enhanced animations for different content types */
+    li {
+      animation-duration: 0.5s;
+    }
+    
+    table {
+      animation-duration: 0.8s;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+      animation-duration: 0.7s;
+    }
+    
+    /* Ensure content stays visible during auto-scroll */
+    * {
+      backface-visibility: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+  }
+  
+  &:focus {
+    outline: none;
+  }
+  
+  /* Cursor styling */
+  caret-color: var(--tt-cursor-color, #3b82f6);
+  
+  /* Selection styling */
+  ::selection {
+    background-color: var(--tt-selection-color, rgba(59, 130, 246, 0.2));
+  }
+
+  /* Table styling */
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 0;
+    overflow: hidden;
+    table-layout: fixed;
+    width: 100%;
+    border: 1px solid var(--tt-gray-light-a-200, #d1d5db);
+    border-radius: 0.5rem;
+
+    td,
+    th {
+      border-right: 1px solid var(--tt-gray-light-a-200, #d1d5db);
+      border-bottom: 1px solid var(--tt-gray-light-a-200, #d1d5db);
+      box-sizing: border-box;
+      min-width: 1em;
+      padding: 8px 12px;
+      position: relative;
+      vertical-align: top;
+
+      > * {
+        margin-bottom: 0;
+      }
+
+      /* Remove right border on last column */
+      &:last-child {
+        border-right: none;
+      }
+    }
+
+    /* Remove bottom border on last row */
+    tr:last-child {
+      td, th {
+        border-bottom: none;
+      }
+    }
+
+    /* First row styling */
+    tr:first-child {
+      th, td {
+        &:first-child {
+          border-top-left-radius: 0.5rem;
+        }
+        &:last-child {
+          border-top-right-radius: 0.5rem;
+        }
+      }
+    }
+
+    /* Last row styling */
+    tr:last-child {
+      td, th {
+        &:first-child {
+          border-bottom-left-radius: 0.5rem;
+        }
+        &:last-child {
+          border-bottom-right-radius: 0.5rem;
+        }
+      }
+    }
+
+    th {
+      background-color: var(--tt-gray-light-100, #f9fafb);
+      font-weight: 600;
+      text-align: left;
+      color: var(--tt-gray-light-900, #1f2937);
+    }
+
+    td {
+      background-color: var(--tt-bg-color, #ffffff);
+    }
+    
+    /* Dark mode support */
+    .dark & {
+      border-color: var(--tt-gray-dark-a-200, #374151);
+      
+      th {
+        background-color: var(--tt-gray-dark-100, #374151);
+        color: var(--tt-gray-dark-900, #f9fafb);
+      }
+      
+      td {
+        border-color: var(--tt-gray-dark-a-200, #374151);
+      }
+      
+      td, th {
+        border-right-color: var(--tt-gray-dark-a-200, #374151);
+        border-bottom-color: var(--tt-gray-dark-a-200, #374151);
+      }
+    }
+
+    .selectedCell:after {
+      background: rgba(59, 130, 246, 0.08);
+      content: '';
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      pointer-events: none;
+      position: absolute;
+      z-index: 2;
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      border-radius: 4px;
+    }
+
+    .column-resize-handle {
+      background-color: rgba(59, 130, 246, 0.7);
+      bottom: -2px;
+      pointer-events: none;
+      position: absolute;
+      right: -2px;
+      top: 0;
+      width: 4px;
+      border-radius: 2px;
+    }
+
+    /* Enhanced hover effects for better UX */
+    /* Exclude pending-delete and pending-insert tables from hover effects */
+    /* Tables in AI Review mode should not have blue hover effects */
+    &:not([data-pending-delete="true"]):not(.pending-delete-table):not([data-pending-insert="true"]):not(.pending-insert-table) tr:hover {
+      background-color: rgba(59, 130, 246, 0.02);
+    }
+
+    /* Individual cell hover when not selected */
+    /* Exclude cells inside pending-delete and pending-insert tables */
+    &:not([data-pending-delete="true"]):not(.pending-delete-table):not([data-pending-insert="true"]):not(.pending-insert-table) td:hover:not(.selectedCell),
+    &:not([data-pending-delete="true"]):not(.pending-delete-table):not([data-pending-insert="true"]):not(.pending-insert-table) th:hover:not(.selectedCell) {
+      background-color: rgba(59, 130, 246, 0.04);
+      transition: background-color 0.15s ease;
+    }
+    
+    /* Focused cell styling */
+    td:focus,
+    th:focus {
+      outline: 2px solid rgba(59, 130, 246, 0.5);
+      outline-offset: -2px;
+    }
+  }
+
+  .tableWrapper {
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+
+  &.resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
+}
+
+.blog-editor-placeholder {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  color: var(--tt-gray-light-400, #999);
+  pointer-events: none;
+  
+  font-variant-numeric: slashed-zero;
+  font-size: 1rem;
+}
+
+/* Mobile responsive adjustments */
+@media screen and (max-width: 480px) {
+  .blog-simple-editor-container .simple-editor-content .tiptap.ProseMirror {
+    padding: 1rem 1.5rem;
+  }
+  
+  .blog-editor-placeholder {
+    top: 1rem;
+    left: 1.5rem;
+  }
+}
+
+/* Ensure proper sizing for full height mode */
+.blog-simple-editor-container[style*="height: 100%"] {
+  min-height: 500px;
+}
+
+/* Text selection bubble menu styling */
+.text-selection-bubble {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.5rem;
+  background: var(--tt-toolbar-bg-color);
+  border: 1px solid var(--tt-toolbar-border-color);
+  border-radius: 0.5rem;
+  box-shadow: var(--tt-shadow-elevated-md);
+  z-index: 50;
+  min-width: 300px;
+
+  .text-selection-link-edit {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+
+    .link-input-inline {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      outline: none;
+      background: var(--tt-bg-color);
+      min-width: 0;
+
+      &::placeholder {
+        color: var(--tt-gray-light-400);
+      }
+    }
+
+    .link-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      margin-left: auto;
+      
+      .tiptap-button {
+        background: none;
+        border: none;
+        padding: 0;
+        min-width: auto;
+        height: auto;
+        border-radius: 0;
+        box-shadow: none;
+        
+        .tiptap-button-icon {
+          width: 1.25rem;
+          height: 1.25rem;
+          flex-shrink: 0;
+        }
+        
+        // Save button - green
+        &:first-child .tiptap-button-icon {
+          color: #22c55e;
+        }
+        
+        // Cancel button - red  
+        &:last-child .tiptap-button-icon {
+          color: #ef4444;
+        }
+        
+        &:hover {
+          background: none;
+          
+          &:first-child .tiptap-button-icon {
+            color: black;
+          }
+          
+          &:last-child .tiptap-button-icon {
+            color: #dc2626;
+          }
+        }
+      }
+    }
+  }
+
+  .tiptap-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  .tiptap-separator {
+    width: 1px;
+    height: 1rem;
+    background-color: var(--tt-border-color);
+    margin: 0 0.25rem;
+  }
+
+  /* Make bubble menu buttons slightly smaller */
+  .tiptap-button {
+    padding: 0.375rem;
+    min-width: auto;
+    height: auto;
+  }
+
+  .tiptap-button-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .keyboard-hint {
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid var(--tt-border-color);
+
+    .hint-text {
+      font-size: 0.75rem;
+      color: var(--tt-gray-light-500, #999);
+      
+  font-variant-numeric: slashed-zero;
+    }
+  }
+}
+
+/* Dark mode support for bubble menu */
+.dark .text-selection-bubble {
+  background: var(--tt-toolbar-bg-color);
+  border-color: var(--tt-toolbar-border-color);
+}
+
+/* Link bubble container for relative positioning */
+.link-bubble-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Website Preview positioned above edit options */
+.website-preview-above {
+  position: relative;
+  z-index: 70;
+  margin-bottom: 0.5rem;
+
+  .preview-content {
+    background: var(--tt-toolbar-bg-color);
+    border: 1px solid var(--tt-toolbar-border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    box-shadow: var(--tt-shadow-elevated-md);
+    overflow: hidden;
+    max-width: 300px;
+
+    .preview-image {
+      width: 100%;
+      height: auto;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 0.375rem;
+      display: block;
+    }
+
+    .preview-fallback {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      min-height: 200px;
+      text-align: center;
+      color: var(--tt-gray-light-500, #999);
+
+      .fallback-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        opacity: 0.6;
+      }
+
+      .fallback-text {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--tt-theme-text, #333);
+        margin-bottom: 0.25rem;
+      }
+
+      .fallback-subtext {
+        font-size: 0.75rem;
+        opacity: 0.7;
+      }
+    }
+  }
+}
+
+/* Link bubble menu styling */
+.link-bubble {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--tt-toolbar-bg-color);
+  border-radius: 0.5rem;
+  box-shadow: var(--tt-shadow-elevated-md);
+  z-index: 50;
+  width: 320px;
+  min-height: 40px;
+  max-height: 40px;
+  box-sizing: border-box;
+
+  .link-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    flex: 1;
+    min-width: 0;
+
+    .link-icon {
+      width: 1rem;
+      height: 1rem;
+      color: var(--tt-brand-color-500);
+      flex-shrink: 0;
+    }
+
+    .link-text {
+      color: var(--tt-brand-color-500);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+      display: block;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .link-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+
+    .tiptap-button {
+      background: none;
+      border: none;
+      padding: 0;
+      min-width: auto;
+      height: auto;
+      border-radius: 0;
+      box-shadow: none;
+      
+      .tiptap-button-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        flex-shrink: 0;
+      }
+      
+      // Edit button - purple
+      &:first-child .tiptap-button-icon {
+        color: #8b5cf6;
+      }
+      
+      // Remove button - red
+      &:last-child .tiptap-button-icon {
+        color: #ef4444;
+      }
+      
+      &:hover {
+        background: none;
+        
+        &:first-child .tiptap-button-icon {
+          color: #7c3aed;
+        }
+        
+        &:last-child .tiptap-button-icon {
+          color: #dc2626;
+        }
+      }
+    }
+  }
+
+  .link-edit-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    height: 100%;
+
+    .link-input-inline {
+      flex: 1;
+      padding: 0.25rem 0.5rem;
+      border: none;
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      outline: none;
+      background: var(--tt-bg-color);
+      min-width: 0;
+      height: 24px;
+      line-height: 1.5;
+
+      &::placeholder {
+        color: var(--tt-gray-light-400);
+      }
+
+      &:focus {
+        outline: none;
+        border: none;
+      }
+    }
+
+    .link-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      
+      .tiptap-button {
+        background: none;
+        border: none;
+        padding: 0;
+        min-width: auto;
+        height: auto;
+        border-radius: 0;
+        box-shadow: none;
+        
+        .tiptap-button-icon {
+          width: 1.25rem;
+          height: 1.25rem;
+          flex-shrink: 0;
+        }
+        
+        // Save button - green
+        &:first-child .tiptap-button-icon {
+          color: #22c55e;
+        }
+        
+        // Cancel button - red  
+        &:last-child .tiptap-button-icon {
+          color: #ef4444;
+        }
+        
+        &:hover {
+          background: none;
+          
+          &:first-child .tiptap-button-icon {
+            color: black;
+          }
+          
+          &:last-child .tiptap-button-icon {
+            color: #dc2626;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Dark mode support for link bubble */
+.dark .link-bubble {
+  background: var(--tt-toolbar-bg-color);
+  border-color: var(--tt-toolbar-border-color);
+
+  .link-input {
+    background: var(--tt-bg-color);
+    border-color: var(--tt-border-color);
+    color: var(--tt-theme-text);
+  }
+}
+
+/* Floating Menu Styles */
+.floating-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: var(--tt-toolbar-bg-color);
+  border: 1px solid var(--tt-toolbar-border-color);
+  border-radius: 0.5rem;
+  box-shadow: var(--tt-shadow-elevated-lg);
+  z-index: 50;
+  min-width: 2.5rem;
+
+  .floating-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0.375rem;
+    background: transparent;
+    border: none;
+    border-radius: 0.375rem;
+    color: var(--tt-theme-text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    outline: none;
+    position: relative;
+
+    &:hover {
+      background: var(--tt-hover-bg-color);
+      color: var(--tt-brand-color-500);
+    }
+
+    &:focus {
+      outline: 2px solid var(--tt-brand-color-500);
+      outline-offset: 1px;
+    }
+
+    &.is-active {
+      background: var(--tt-brand-color-100);
+      color: var(--tt-brand-color-600);
+    }
+
+    svg {
+      width: 0.875rem;
+      height: 0.875rem;
+      flex-shrink: 0;
+    }
+
+    .dropdown-chevron {
+      width: 0.625rem;
+      height: 0.625rem;
+      margin-left: 0.125rem;
+      opacity: 0.6;
+    }
+  }
+
+  /* Floating Dropdown Container */
+  .floating-dropdown-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Floating Dropdown Menu */
+  .floating-dropdown-menu {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 0.5rem);
+    background: var(--tt-toolbar-bg-color);
+    border: 1px solid var(--tt-toolbar-border-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--tt-shadow-elevated-lg);
+    padding: 0.25rem;
+    min-width: 12rem;
+    z-index: 60;
+    animation: fadeInScale 0.15s ease-out;
+
+    .floating-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      background: transparent;
+      border: none;
+      border-radius: 0.375rem;
+      color: var(--tt-theme-text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+      font-size: 0.875rem;
+
+      &:hover {
+        background: var(--tt-hover-bg-color);
+        color: var(--tt-brand-color-500);
+      }
+
+      &.is-active {
+        background: var(--tt-brand-color-100);
+        color: var(--tt-brand-color-600);
+        font-weight: 500;
+      }
+
+      svg {
+        width: 0.875rem;
+        height: 0.875rem;
+        flex-shrink: 0;
+      }
+
+      .dropdown-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 0.875rem;
+        height: 0.875rem;
+        font-size: 0.625rem;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      span:last-child {
+        flex: 1;
+      }
+    }
+  }
+}
+
+/* Dark mode support for floating menu */
+.dark .floating-menu {
+  background: var(--tt-toolbar-bg-color);
+  border-color: var(--tt-toolbar-border-color);
+
+  .floating-menu-button {
+    color: var(--tt-theme-text);
+
+    &:hover {
+      background: var(--tt-hover-bg-color);
+      color: var(--tt-brand-color-400);
+    }
+
+    &.is-active {
+      background: var(--tt-brand-color-900);
+      color: var(--tt-brand-color-300);
+    }
+  }
+
+  .floating-dropdown-menu {
+    background: var(--tt-toolbar-bg-color);
+    border-color: var(--tt-toolbar-border-color);
+
+    .floating-dropdown-item {
+      color: var(--tt-theme-text);
+
+      &:hover {
+        background: var(--tt-hover-bg-color);
+        color: var(--tt-brand-color-400);
+      }
+
+      &.is-active {
+        background: var(--tt-brand-color-900);
+        color: var(--tt-brand-color-300);
+      }
+    }
+  }
+}
+
+/* Animation for floating menu appearance */
+.floating-menu {
+  animation: fadeInScale 0.15s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Paragraph Icon Styles */
+.paragraph-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  
+  font-variant-numeric: slashed-zero;
+}
+
+/* Dropdown menu item button styling */
+.dropdown-menu-item-button {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+
+/* Font Family Support - Following TipTap CSS patterns */
+.tiptap.ProseMirror {
+  /* Font family will be applied via inline styles from the extension */
+  
+  /* Ensure proper inheritance for nested elements */
+  span[style*="font-family"] {
+    font-family: inherit;
+  }
+  
+  /* Maintain readability with different fonts */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Font Family Dropdown Menu Styles moved to component's own SCSS file */
+
+/* Table bubble menu styles */
+.table-bubble-menu {
+  .bubble-button {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    height: auto;
+    min-width: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Toolbar link popover - rendered via portal to escape overflow:hidden containers */
+.link-popover-content {
+  padding: 0.75rem !important;
+  min-width: 280px;
+  max-width: 400px;
+  width: max-content;
+  background: var(--tt-toolbar-bg-color, #ffffff) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  border-radius: 0.5rem !important;
+  box-shadow: var(--tt-shadow-elevated-lg) !important;
+
+  @media (max-width: 768px) {
+    min-width: 250px;
+    max-width: calc(100vw - 4rem);
+  }
+
+  .link-dialog-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+
+    .link-input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 0.25rem;
+      font-size: 0.875rem;
+      outline: none;
+      background: var(--tt-bg-color, #ffffff);
+      min-width: 0;
+      height: 2rem;
+      line-height: 1;
+
+      &::placeholder {
+        color: var(--tt-gray-light-400);
+      }
+
+      &:focus {
+        border-color: rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+      }
+    }
+
+    .link-dialog-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      flex-shrink: 0;
+
+      .link-action-button {
+        background: none;
+        border: none;
+        padding: 0.375rem;
+        min-width: 2rem;
+        height: 2rem;
+        border-radius: 0.25rem;
+        box-shadow: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .tiptap-button-icon {
+          width: 1rem;
+          height: 1rem;
+          flex-shrink: 0;
+          color: #000000;
+        }
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.05);
+
+          .tiptap-button-icon {
+            color: #000000;
+          }
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+
+          &:hover {
+            background: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/* Enhanced typing animations optimized for auto-scroll */
+@keyframes typeInText {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+    filter: blur(0.5px);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(4px) scale(0.995);
+    filter: blur(0.2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Fallback animation for legacy support */
+@keyframes fadeInText {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+    filter: blur(1px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Diff Comparison Styles */
+// Insertion marks (content added in current version) - Light green
+ins,
+ins.diff-insertion,
+ins[data-diff="insertion"] {
+  background-color: #D5F6E7 !important; // Light green background
+  color: black !important; // Dark green text
+  text-decoration: none !important;
+  border-radius: 3px !important;
+  padding: 2px 4px !important;
+  margin: 0 1px !important;
+  position: relative;
+  display: inline !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+
+  // Smooth transition
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #D5F6E7 !important;
+    box-shadow: 0 0 0 2px rgba(0, 102, 0, 0.3) !important;
+    cursor: help;
+    opacity: 0.9;
+  }
+}
+
+// Deletion marks (content removed from version) - Light red
+del,
+del.diff-deletion,
+del[data-diff="deletion"] {
+  background-color: #FCE7E4 !important; // Light red background
+  color: #FCE7E4 !important; // Dark red text
+  text-decoration: line-through !important;
+  text-decoration-color: #FCE7E4 !important;
+  text-decoration-thickness: 1.5px !important;
+  border-radius: 3px !important;
+  padding: 2px 4px !important;
+  margin: 0 1px !important;
+  position: relative;
+  display: inline !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+
+  // Smooth transition
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #FCE7E4 !important;
+    box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.3) !important;
+    cursor: help;
+    opacity: 0.9;
+  }
+}
+
+// Ensure diff marks work well within different content types
+.ProseMirror {
+  // Global diff insertion styles
+  ins.diff-insertion,
+  ins[data-diff="insertion"] {
+    color: black !important;
+    text-decoration: none !important;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    display: inline;
+  }
+
+  // Global diff deletion styles
+  del,
+  del.diff-deletion,
+  del[data-diff="deletion"] {
+    background-color: #FCE7E4 !important; // Light red
+    color: #FCE7E4 !important; // Dark red text
+    text-decoration: line-through !important;
+    text-decoration-color: #FCE7E4 !important;
+    text-decoration-thickness: 1.5px !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+    font-weight: 500 !important;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    display: inline !important;
+    opacity: 1 !important;
+  }
+
+  // Handle diff marks in headings
+  h1, h2, h3, h4, h5, h6 {
+    ins.diff-insertion,
+    ins[data-diff="insertion"] {
+      font-size: inherit;
+      font-weight: inherit;
+      color: black !important;
+    }
+
+    del,
+    del.diff-deletion,
+    del[data-diff="deletion"] {
+      font-size: inherit;
+      background-color: #FCE7E4 !important; // Light red
+      color: #FCE7E4 !important; // Dark red text
+      text-decoration: line-through !important;
+      text-decoration-color: #FCE7E4 !important;
+      padding: 2px 4px !important;
+      border-radius: 3px !important;
+      font-weight: 500 !important;
+    }
+  }
+
+  // Handle diff marks in lists
+  ul, ol {
+    ins.diff-insertion,
+    ins[data-diff="insertion"],
+    del.diff-deletion,
+    del[data-diff="deletion"] {
+      display: inline;
+    }
+  }
+
+  // Handle diff marks in code blocks
+  pre, code {
+    ins.diff-insertion,
+    ins[data-diff="insertion"] {
+      background-color: rgba(34, 197, 94, 0.3) !important;
+      color: #15803d !important;
+      font-family: inherit;
+    }
+
+    del,
+    del.diff-deletion,
+    del[data-diff="deletion"] {
+      background-color: #FCE7E4 !important; // Light red for code
+      color: #FCE7E4 !important;
+      text-decoration: line-through !important;
+      text-decoration-color: #FCE7E4 !important;
+      padding: 2px 4px !important;
+      border-radius: 3px !important;
+      font-weight: 500 !important;
+      font-family: inherit;
+    }
+  }
+
+  // Handle diff marks in paragraphs
+  p {
+    ins.diff-insertion,
+    ins[data-diff="insertion"],
+    del.diff-deletion,
+    del[data-diff="deletion"] {
+      display: inline;
+    }
+  }
+}
+
+/* Search and Replace Highlight Styles */
+.search-result {
+  background-color: rgba(255, 213, 79, 0.4) !important; // Yellow highlight
+  border-radius: 3px;
+  padding: 2px 0;
+  transition: background-color 0.2s ease;
+
+  &.search-result-current {
+    background-color: rgba(255, 152, 0, 0.6) !important; // Orange highlight for current result
+    box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.4);
+  }
+}
+
+// Ensure search highlights work in all content types
+.ProseMirror {
+  .search-result {
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    display: inline;
+  }
+}
+
+/* Code Block Pending Delete/Insert Styles for AI Review Mode */
+/* Using maximum specificity to override all other styles */
+
+// Code block pending deletion - coral border and background
+// Use both attribute and class selectors for maximum persistence during React re-renders
+.blog-simple-editor-container .simple-editor-content .tiptap.ProseMirror pre[data-pending-delete="true"],
+.blog-simple-editor-container .simple-editor-content .tiptap.ProseMirror pre.pending-delete-codeblock,
+.tiptap.ProseMirror pre[data-pending-delete="true"],
+.tiptap.ProseMirror pre.pending-delete-codeblock {
+  position: relative !important;
+  border: 2px solid #EE877B !important;
+  background-color: rgba(238, 135, 123, 0.15) !important;
+  border-radius: 6px !important;
+  transition: none !important; // Prevent any transition effects on hover
+
+  // Prevent hover from changing background
+  &:hover {
+    background-color: rgba(238, 135, 123, 0.15) !important;
+    border-color: #EE877B !important;
+    transition: none !important;
+  }
+
+  // Coral overlay effect
+  &::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background-color: rgba(238, 135, 123, 0.1) !important;
+    pointer-events: none !important;
+    border-radius: 4px !important;
+    transition: none !important;
+  }
+
+  // Strikethrough effect on the code content with coral color
+  code {
+    text-decoration: line-through !important;
+    text-decoration-color: #EE877B !important;
+    text-decoration-thickness: 2px !important;
+    color: #c45a4e !important;
+    opacity: 0.8 !important;
+    background-color: transparent !important;
+    transition: none !important;
+
+    &:hover {
+      background-color: transparent !important;
+      transition: none !important;
+    }
+  }
+}
+
+// Code block pending insertion - green border and background
+// NO label - just green styling, action buttons handled by parent component
+// Use both attribute and class selectors for maximum persistence during React re-renders
+.blog-simple-editor-container .simple-editor-content .tiptap.ProseMirror pre[data-pending-insert="true"],
+.blog-simple-editor-container .simple-editor-content .tiptap.ProseMirror pre[data-new-content="true"],
+.blog-simple-editor-container .simple-editor-content .tiptap.ProseMirror pre.pending-insert-codeblock,
+.tiptap.ProseMirror pre[data-pending-insert="true"],
+.tiptap.ProseMirror pre[data-new-content="true"],
+.tiptap.ProseMirror pre.pending-insert-codeblock {
+  position: relative !important;
+  border: 2px solid #22c55e !important;
+  background-color: #D5F6E7 !important;
+  border-radius: 6px !important;
+  transition: none !important; // Prevent any transition effects on hover
+
+  // Prevent hover from changing background - keep green styling
+  &:hover {
+    background-color: #D5F6E7 !important;
+    border-color: #22c55e !important;
+    transition: none !important;
+  }
+
+  // Style the code content inside - no strikethrough, just green background
+  code {
+    background-color: transparent !important;
+    color: inherit !important;
+    border: none !important;
+    transition: none !important;
+
+    &:hover {
+      background-color: transparent !important;
+      transition: none !important;
+    }
+  }
+}
+
+/* Table Pending Delete/Insert Styles for AI Review Mode */
+.ProseMirror {
+  // Table pending deletion - coral/red border and background overlay
+  // NO CONTROLS - just for comparison (Replacement: Coral = no buttons)
+  // Use both attribute and class selectors for maximum persistence during React re-renders
+  table[data-pending-delete="true"],
+  table.pending-delete-table {
+    position: relative;
+    border: 2px solid #EE877B !important;
+    background-color: rgba(238, 135, 123, 0.15) !important;
+    border-radius: 6px;
+    pointer-events: none !important; // Disable ALL interactions
+    user-select: none !important;
+
+    // Coral overlay effect
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(238, 135, 123, 0.1);
+      pointer-events: none;
+      border-radius: 4px;
+    }
+
+    // Coral strikethrough on all cells content
+    th, td {
+      background-color: rgba(238, 135, 123, 0.2) !important;
+      border-color: #EE877B !important;
+      pointer-events: none !important;
+
+      // Prevent hover from changing background
+      &:hover {
+        background-color: rgba(238, 135, 123, 0.2) !important;
+      }
+
+      p, span, a, strong, em, u, s {
+        text-decoration: line-through;
+        text-decoration-color: #EE877B;
+        text-decoration-thickness: 2px;
+        color: #c45a4e;
+        opacity: 0.8;
+      }
+    }
+
+    // Prevent row hover from changing background
+    tr:hover {
+      background-color: transparent !important;
+    }
+
+    // Header cells slightly darker
+    th {
+      background-color: rgba(238, 135, 123, 0.35) !important;
+
+      // Prevent hover from changing header background
+      &:hover {
+        background-color: rgba(238, 135, 123, 0.35) !important;
+      }
+    }
+
+    // Hide all grips and controls inside
+    .grip-column, .grip-row, .grip-table,
+    [class*="grip"], [class*="handle"], [class*="resize"] {
+      display: none !important;
+    }
+  }
+
+  // Table pending insertion - green border, light green background (#D5F6E7)
+  // Shows Discard/Accept buttons (handled by TipTap/parent component)
+  // Use both attribute and class selectors for maximum persistence during React re-renders
+  table[data-pending-insert="true"],
+  table.pending-insert-table {
+    position: relative;
+    border: 2px solid #22c55e !important;
+    background-color: #D5F6E7 !important;
+    border-radius: 6px;
+    margin-top: 28px; // Space for "New table" label
+
+    // Light green on all cells - no transitions to prevent flickering
+    th, td {
+      background-color: #D5F6E7 !important;
+      border-color: #22c55e !important;
+      transition: none !important; // Prevent any transition effects
+    }
+
+    // Header cells slightly darker
+    th {
+      background-color: #c2f0db !important;
+    }
+
+    // Prevent ALL hover from changing background colors - keep green styling
+    // This includes when mouse enters AND leaves the table
+    tr, tr:hover {
+      background-color: transparent !important;
+      transition: none !important;
+    }
+
+    td, td:hover {
+      background-color: #D5F6E7 !important;
+      transition: none !important;
+    }
+
+    th, th:hover {
+      background-color: #c2f0db !important;
+      transition: none !important;
+    }
+
+    // "New table" label indicator
+    &::before {
+      content: 'New table';
+      position: absolute;
+      top: -24px;
+      left: 0;
+      background: #22c55e;
+      color: white;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 4px 4px 0 0;
+      z-index: 10;
+    }
+  }
+
+  // CRITICAL: Extra high-specificity rules to prevent ANY white flash on green tables
+  // This covers all edge cases including when other tables are hovered
+  .ProseMirror table[data-pending-insert="true"] td,
+  .ProseMirror table[data-pending-insert="true"] td:hover,
+  .ProseMirror table[data-pending-insert="true"] td:focus,
+  .ProseMirror table[data-pending-insert="true"] td:active,
+  .ProseMirror table.pending-insert-table td,
+  .ProseMirror table.pending-insert-table td:hover,
+  .ProseMirror table.pending-insert-table td:focus,
+  .ProseMirror table.pending-insert-table td:active {
+    background-color: #D5F6E7 !important;
+    transition: none !important;
+  }
+
+  .ProseMirror table[data-pending-insert="true"] th,
+  .ProseMirror table[data-pending-insert="true"] th:hover,
+  .ProseMirror table[data-pending-insert="true"] th:focus,
+  .ProseMirror table[data-pending-insert="true"] th:active,
+  .ProseMirror table.pending-insert-table th,
+  .ProseMirror table.pending-insert-table th:hover,
+  .ProseMirror table.pending-insert-table th:focus,
+  .ProseMirror table.pending-insert-table th:active {
+    background-color: #c2f0db !important;
+    transition: none !important;
+  }
+
+  .ProseMirror table[data-pending-insert="true"] tr,
+  .ProseMirror table[data-pending-insert="true"] tr:hover,
+  .ProseMirror table.pending-insert-table tr,
+  .ProseMirror table.pending-insert-table tr:hover {
+    background-color: transparent !important;
+    transition: none !important;
+  }
+}
+
+// Hide ALL table controls on pending-delete tables (tableWrapper level)
+// Use both attribute and class selectors for maximum persistence
+.tableWrapper:has(table[data-pending-delete="true"]),
+.tableWrapper:has(table.pending-delete-table) {
+  pointer-events: none !important;
+
+  // Hide grips, handles, resize controls
+  .grip-column, .grip-row, .grip-table,
+  [class*="grip"], [class*="handle"], [class*="resize"],
+  .tableControls, .table-menu, button {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
+// Hide bubble menu for pending-insert tables as well (use global Accept/Reject buttons)
+// Use both attribute and class selectors for maximum persistence
+.tableWrapper:has(table[data-pending-insert="true"]),
+.tableWrapper:has(table.pending-insert-table) {
+  // Hide grips, handles, resize controls on green tables too
+  .grip-column, .grip-row, .grip-table,
+  [class*="grip"], [class*="handle"], [class*="resize"] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
+// Global: Hide table-bubble-menu when any pending table is active
+// This is a fallback in case the shouldShow logic doesn't work
+// Use both attribute and class selectors for maximum persistence
+.table-bubble-menu {
+  // Will be hidden via JS, but add CSS fallback
+  &:has(~ .ProseMirror table[data-pending-delete="true"]),
+  &:has(~ .ProseMirror table.pending-delete-table),
+  &:has(~ .ProseMirror table[data-pending-insert="true"]),
+  &:has(~ .ProseMirror table.pending-insert-table) {
+    display: none !important;
+  }
+}
+

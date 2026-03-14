@@ -1,0 +1,416 @@
+/* Table Node Styles - Consistent with existing TipTap design */
+.tiptap {
+  /* Enhanced table styling to match existing editor design */
+  table {
+    border-collapse: collapse;
+    margin: 0;
+    overflow: hidden;
+    table-layout: fixed;
+    width: 100%;
+
+    td,
+    th {
+      border: 1px solid var(--tt-gray-light-a-200);
+      box-sizing: border-box;
+      min-width: 1em;
+      padding: 6px 8px;
+      position: relative;
+      vertical-align: top;
+
+      > * {
+        margin-bottom: 0;
+      }
+    }
+
+    th {
+      background-color: var(--tt-gray-light-100);
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .dark & th {
+      background-color: var(--tt-gray-dark-100);
+      border-color: var(--tt-gray-dark-a-200);
+    }
+
+    .dark & td {
+      border-color: var(--tt-gray-dark-a-200);
+    }
+
+    .selectedCell:after {
+      background: var(--tt-gray-light-200);
+      content: '';
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      pointer-events: none;
+      position: absolute;
+      z-index: 2;
+    }
+
+    .column-resize-handle {
+      background-color: var(--tt-brand-color-500);
+      bottom: -2px;
+      pointer-events: none;
+      position: absolute;
+      right: -2px;
+      top: 0;
+      width: 4px;
+    }
+  }
+
+  .tableWrapper {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  &.resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
+}
+
+/* Additional table-specific enhancements */
+.tiptap-table {
+  /* Use same styling as above but with class selector for backward compatibility */
+  border-collapse: collapse;
+  margin: 0;
+  overflow: hidden;
+  table-layout: fixed;
+  width: 100%;
+
+  td,
+  th {
+    border: 1px solid var(--tt-gray-light-a-200);
+    box-sizing: border-box;
+    min-width: 1em;
+    padding: 6px 8px;
+    position: relative;
+    vertical-align: top;
+
+    > * {
+      margin-bottom: 0;
+    }
+  }
+
+  th {
+    background-color: var(--tt-gray-light-100);
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .dark & th {
+    background-color: var(--tt-gray-dark-100);
+    border-color: var(--tt-gray-dark-a-200);
+  }
+
+  .dark & td {
+    border-color: var(--tt-gray-dark-a-200);
+  }
+
+  .selectedCell:after {
+    background: rgba(59, 130, 246, 0.08);
+    content: '';
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 2;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 4px;
+  }
+
+  .column-resize-handle {
+    background-color: var(--tt-brand-color-500);
+    bottom: -2px;
+    pointer-events: none;
+    position: absolute;
+    right: -2px;
+    top: 0;
+    width: 4px;
+  }
+}
+
+/* Table bubble menu styles */
+.table-bubble-menu {
+  .bubble-button {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    height: auto;
+    min-width: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Prosemirror table selection styles */
+.ProseMirror {
+  .tableWrapper {
+    overflow-x: auto;
+    margin: 1.5rem 0;
+  }
+
+  .selectedCell:after {
+    background: rgba(59, 130, 246, 0.08);
+    content: "";
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+    position: absolute;
+    z-index: 2;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-radius: 4px;
+  }
+
+  &.resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+  }
+}
+
+/* Table controls styling */
+.tiptap-table-controls {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiptap-table-button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid var(--tt-gray-light-a-200);
+  border-radius: 0.375rem;
+  background-color: var(--tt-gray-light-100);
+  color: var(--tt-gray-light-900);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--tt-gray-light-200);
+  }
+
+  &:active {
+    background-color: var(--tt-gray-light-300);
+  }
+
+  &.active {
+    background-color: var(--tt-brand-color-500);
+    color: white;
+    border-color: var(--tt-brand-color-500);
+  }
+
+  .dark & {
+    border-color: var(--tt-gray-dark-a-200);
+    background-color: var(--tt-gray-dark-100);
+    color: var(--tt-gray-dark-900);
+
+    &:hover {
+      background-color: var(--tt-gray-dark-200);
+    }
+
+    &:active {
+      background-color: var(--tt-gray-dark-300);
+    }
+
+    &.active {
+      background-color: var(--tt-brand-color-400);
+      color: white;
+      border-color: var(--tt-brand-color-400);
+    }
+  }
+}
+
+/* ========================================================================
+   TABLE PENDING DELETE/INSERT STYLES - AI Review Mode
+   ======================================================================== */
+
+/* Table pending deletion - red/coral border, red background, strikethrough text */
+/* NO ACTION BUTTONS on red table - only for comparison */
+.ProseMirror table[data-pending-delete="true"],
+.tiptap table[data-pending-delete="true"],
+table.tiptap-table[data-pending-delete="true"] {
+  position: relative;
+  border: 2px solid #EE877B !important;
+  background-color: rgba(238, 135, 123, 0.15) !important;
+  border-radius: 6px;
+  overflow: visible;
+  pointer-events: none; /* Disable all interactions on red table */
+
+  /* Red overlay effect */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(238, 135, 123, 0.1);
+    pointer-events: none;
+    border-radius: 4px;
+    z-index: 1;
+  }
+
+  /* All cells get red styling */
+  td,
+  th {
+    background-color: rgba(238, 135, 123, 0.2) !important;
+    border-color: #EE877B !important;
+    position: relative;
+  }
+
+  /* Header cells slightly darker */
+  th {
+    background-color: rgba(238, 135, 123, 0.35) !important;
+  }
+
+  /* Red strikethrough on ALL text content inside cells */
+  td p,
+  td span,
+  td a,
+  td strong,
+  td em,
+  td u,
+  td s,
+  th p,
+  th span,
+  th a,
+  th strong,
+  th em,
+  th u,
+  th s {
+    text-decoration: line-through !important;
+    text-decoration-color: #EE877B !important;
+    text-decoration-thickness: 2px !important;
+    color: #c45a4e !important;
+    opacity: 0.8;
+  }
+}
+
+/* Hide ALL controls/buttons on red (pending delete) table wrapper */
+.tableWrapper:has(table[data-pending-delete="true"]) {
+  /* Hide any floating buttons, menus, controls */
+  .tableControls,
+  .table-menu,
+  .table-actions,
+  button,
+  .grip-column,
+  .grip-row,
+  .grip-table {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+/* Table pending insertion - green border, light green background (#D5F6E7) */
+/* Use both attribute and class selectors for maximum persistence */
+.ProseMirror table[data-pending-insert="true"],
+.ProseMirror table.pending-insert-table,
+.tiptap table[data-pending-insert="true"],
+.tiptap table.pending-insert-table,
+table.tiptap-table[data-pending-insert="true"],
+table.tiptap-table.pending-insert-table {
+  position: relative;
+  border: 2px solid #22c55e !important;
+  background-color: #D5F6E7 !important;
+  border-radius: 6px;
+  margin-top: 28px; /* Space for "New table" label */
+
+  /* "New table" label at top-left */
+  &::before {
+    content: 'New table';
+    position: absolute;
+    top: -24px;
+    left: 0;
+    background: #22c55e;
+    color: white;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px 4px 0 0;
+    z-index: 10;
+  }
+
+  /* All cells get light green background - no transitions */
+  td,
+  th {
+    background-color: #D5F6E7 !important;
+    border-color: #22c55e !important;
+    transition: none !important;
+  }
+
+  /* Header cells slightly darker green */
+  th {
+    background-color: #c2f0db !important;
+  }
+
+  /* Prevent ALL hover effects from changing background colors */
+  /* Keep green styling consistent when mouse enters AND leaves */
+  tr,
+  tr:hover {
+    background-color: transparent !important;
+    transition: none !important;
+  }
+
+  td,
+  td:hover {
+    background-color: #D5F6E7 !important;
+    transition: none !important;
+  }
+
+  th,
+  th:hover {
+    background-color: #c2f0db !important;
+    transition: none !important;
+  }
+}
+
+/* CRITICAL: Extra high-specificity rules to prevent ANY white flash on green tables */
+/* This covers all edge cases including when other tables are hovered */
+.ProseMirror table[data-pending-insert="true"] td,
+.ProseMirror table[data-pending-insert="true"] td:hover,
+.ProseMirror table[data-pending-insert="true"] td:focus,
+.ProseMirror table[data-pending-insert="true"] td:active,
+.ProseMirror table.pending-insert-table td,
+.ProseMirror table.pending-insert-table td:hover,
+.ProseMirror table.pending-insert-table td:focus,
+.ProseMirror table.pending-insert-table td:active,
+.tiptap table[data-pending-insert="true"] td,
+.tiptap table[data-pending-insert="true"] td:hover,
+.tiptap table.pending-insert-table td,
+.tiptap table.pending-insert-table td:hover {
+  background-color: #D5F6E7 !important;
+  transition: none !important;
+}
+
+.ProseMirror table[data-pending-insert="true"] th,
+.ProseMirror table[data-pending-insert="true"] th:hover,
+.ProseMirror table[data-pending-insert="true"] th:focus,
+.ProseMirror table[data-pending-insert="true"] th:active,
+.ProseMirror table.pending-insert-table th,
+.ProseMirror table.pending-insert-table th:hover,
+.ProseMirror table.pending-insert-table th:focus,
+.ProseMirror table.pending-insert-table th:active,
+.tiptap table[data-pending-insert="true"] th,
+.tiptap table[data-pending-insert="true"] th:hover,
+.tiptap table.pending-insert-table th,
+.tiptap table.pending-insert-table th:hover {
+  background-color: #c2f0db !important;
+  transition: none !important;
+}
+
+.ProseMirror table[data-pending-insert="true"] tr,
+.ProseMirror table[data-pending-insert="true"] tr:hover,
+.ProseMirror table.pending-insert-table tr,
+.ProseMirror table.pending-insert-table tr:hover,
+.tiptap table[data-pending-insert="true"] tr,
+.tiptap table[data-pending-insert="true"] tr:hover,
+.tiptap table.pending-insert-table tr,
+.tiptap table.pending-insert-table tr:hover {
+  background-color: transparent !important;
+  transition: none !important;
+}

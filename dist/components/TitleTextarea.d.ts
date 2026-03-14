@@ -1,4 +1,7 @@
 import { default as React } from 'react';
-import { TitleTextareaProps } from '../types/editor.types';
-export declare const TitleTextarea: React.FC<TitleTextareaProps>;
+export declare const TitleTextarea: React.FC<{
+    title: string;
+    onTitleChange?: (title: string) => void;
+    readOnly?: boolean;
+}>;
 //# sourceMappingURL=TitleTextarea.d.ts.map
