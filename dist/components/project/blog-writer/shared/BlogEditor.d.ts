@@ -40,6 +40,7 @@ export interface BlogEditorProps {
     featuredImageUrl?: string;
     onEditFeaturedImage?: () => void;
     isGeneratingImage?: boolean;
+    projectId?: string;
 }
 declare const BlogEditor: React.FC<BlogEditorProps>;
 export default BlogEditor;

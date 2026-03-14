@@ -43,6 +43,8 @@ export interface BlogEditorProps {
   onEditFeaturedImage?: () => void;
   // Whether a featured image is currently being generated
   isGeneratingImage?: boolean;
+  // Pass to enable Media Library image picker in toolbar
+  projectId?: string;
 }
 
 const DiscardIcon = () => (
@@ -53,8 +55,8 @@ const DiscardIcon = () => (
 
 const AcceptIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M9 15.75V15.75C5.27175 15.75 2.25 12.7282 2.25 9V9C2.25 5.27175 5.27175 2.25 9 2.25V2.25C12.7282 2.25 15.75 5.27175 15.75 9V9C15.75 12.7282 12.7282 15.75 9 15.75Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M12 7.5L8.25 11.25L6 9" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path fillRule="evenodd" clipRule="evenodd" d="M9 15.75V15.75C5.27175 15.75 2.25 12.7282 2.25 9V9C2.25 5.27175 5.27175 2.25 9 2.25V2.25C12.7282 2.25 15.75 5.27175 15.75 9V9C15.75 12.7282 12.7282 15.75 9 15.75Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+<path d="M12 7.5L8.25 11.25L6 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 </svg>
 
 );
@@ -145,7 +147,8 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
   onDiffPairsChange,
   featuredImageUrl,
   onEditFeaturedImage,
-  isGeneratingImage = false
+  isGeneratingImage = false,
+  projectId,
 }) => {
   const [activeReviewIndex, setActiveReviewIndex] = useState<number>(-1);
   const [diffRanges, setDiffRanges] = useState<{from: number, to: number, rect: {top: number, left: number, width: number, bottom: number, right: number}}[]>([]);
@@ -3989,6 +3992,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
             height="100%" className={`h-full w-full blog-editor-styled ${!title ? 'no-title' : ''}`} documentTitle={title} animated={true}
             readOnly={readOnly} isStreaming={Boolean(isStreaming)}
             disableAutoScroll={disableAutoScroll} onUserScrollChange={onUserScrollChange}
+            projectId={projectId}
             titleElement={
               <div className="px-8 pt-5 pb-0">
                 {(isGeneratingImage || isStreaming) ? (

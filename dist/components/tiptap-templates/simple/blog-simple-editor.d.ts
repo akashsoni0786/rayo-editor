@@ -44,8 +44,9 @@ export interface BlogSimpleEditorProps {
     disableAutoScroll?: boolean;
     onUserScrollChange?: (isScrolledUp: boolean) => void;
     titleElement?: React.ReactNode;
+    projectId?: string;
 }
-export declare function BlogSimpleEditor({ ref, initialValue, onChange, placeholder, readOnly, height, className, onFocus, onBlur, documentTitle, animated, magnification, distance, spring, isStreaming, onAriScoreChange, disableAutoScroll, onUserScrollChange, titleElement }: BlogSimpleEditorProps & {
+export declare function BlogSimpleEditor({ ref, initialValue, onChange, placeholder, readOnly, height, className, onFocus, onBlur, documentTitle, animated, magnification, distance, spring, isStreaming, onAriScoreChange, disableAutoScroll, onUserScrollChange, titleElement, projectId, }: BlogSimpleEditorProps & {
     ref?: React.Ref<BlogSimpleEditorRef>;
 }): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=blog-simple-editor.d.ts.map

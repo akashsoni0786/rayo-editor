@@ -376,13 +376,20 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
 
   const handleClick = (e: React.MouseEvent) => {
     if (!fileItem) {
-        // Prevent native file picker if we want to open gallery
         e.preventDefault();
         e.stopPropagation();
-        
-        // Dispatch event to open Rayo Image Gallery
-        const event = new CustomEvent('open-image-gallery');
+
+        // Try to open image gallery; if no handler responds, fall back to native file picker
+        let galleryOpened = false;
+        const event = new CustomEvent('open-image-gallery', {
+          detail: { onOpen: () => { galleryOpened = true; } }
+        });
         window.dispatchEvent(event);
+
+        if (!galleryOpened) {
+          // No gallery available — use native file picker
+          inputRef.current?.click();
+        }
     }
   }
 

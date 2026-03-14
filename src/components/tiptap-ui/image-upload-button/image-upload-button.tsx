@@ -111,8 +111,9 @@ export function ImageUploadButton({
 
   // Listen for global open-image-gallery event
   React.useEffect(() => {
-    const handleGlobalOpen = () => {
+    const handleGlobalOpen = (e: Event) => {
       if (!disabled && projectId) {
+        (e as CustomEvent).detail?.onOpen?.();
         setIsGalleryOpen(true);
       }
     };

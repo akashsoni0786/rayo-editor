@@ -1,4 +1,5 @@
 import * as React from "react"
+import * as ReactDOM from "react-dom"
 import { EditorContent, EditorContext, useEditor, BubbleMenu, FloatingMenu, type Editor } from "@tiptap/react"
 import { useMotionValue } from "framer-motion"
 
@@ -115,7 +116,7 @@ import { asBlob } from 'html-docx-js-typescript'
 import { TableBubble } from "./table-bubble"
 import { GenerativeMenuSwitch } from "../../tiptap-ui/ai/GenerativeMenuSwitch"
 import { TextButtons } from "../../tiptap-ui/ai/TextButtons"
-import { Popover, PopoverTrigger, PopoverContent } from "../../ui/popover"
+// Popover removed - using fixed overlay dialog instead (avoids floating-ui bundling issues)
 
 
 // Sexy Link Edit Component with inline dialog
@@ -330,10 +331,11 @@ export interface BlogSimpleEditorProps {
     stiffness: number;
     damping: number;
   };
-  isStreaming?: boolean; // Add flag to indicate content is being streamed
-  disableAutoScroll?: boolean; // Disable auto-scroll when user manually scrolls up
-  onUserScrollChange?: (isScrolledUp: boolean) => void; // Callback when user scroll state changes
-  titleElement?: React.ReactNode; // Optional title element to render inside scrollable area
+  isStreaming?: boolean;
+  disableAutoScroll?: boolean;
+  onUserScrollChange?: (isScrolledUp: boolean) => void;
+  titleElement?: React.ReactNode;
+  projectId?: string; // Pass to enable Media Library image picker
 }
 
 // Ensure URLs have a protocol prefix so they don't become relative links
@@ -353,6 +355,7 @@ const MainToolbarContent = ({
   isScrollable = false,
   editor,
   documentTitle,
+  projectId,
 }: {
   animated?: boolean;
   mouseX?: any;
@@ -362,13 +365,30 @@ const MainToolbarContent = ({
   isScrollable?: boolean;
   editor?: Editor | null;
   documentTitle?: string;
+  projectId?: string;
 }) => {
   const Group = animated ? AnimatedToolbarGroup : ToolbarGroup;
   const Separator = animated ? AnimatedToolbarSeparator : ToolbarSeparator;
   
   const [showLinkDialog, setShowLinkDialog] = React.useState(false)
   const [linkUrl, setLinkUrl] = React.useState('')
+  const [linkPopupPos, setLinkPopupPos] = React.useState<{ top: number; left: number } | null>(null)
   const linkInputRef = React.useRef<HTMLInputElement>(null)
+  const linkPopupRef = React.useRef<HTMLDivElement>(null)
+  const linkButtonRef = React.useRef<HTMLDivElement>(null)
+
+  // Close link popup when clicking outside
+  React.useEffect(() => {
+    if (!showLinkDialog) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (linkPopupRef.current && !linkPopupRef.current.contains(e.target as Node) &&
+          linkButtonRef.current && !linkButtonRef.current.contains(e.target as Node)) {
+        handleCancelLink()
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showLinkDialog])
   
   // Embed state (YouTube, Instagram, Twitter)
   const [isEmbedOpen, setIsEmbedOpen] = React.useState(false)
@@ -381,6 +401,17 @@ const MainToolbarContent = ({
   const [isExportOpen, setIsExportOpen] = React.useState(false)
 
   const handleAddLink = () => {
+    if (linkButtonRef.current) {
+      const rect = linkButtonRef.current.getBoundingClientRect()
+      const popupWidth = 300
+      const centerX = rect.left + rect.width / 2
+      // Clamp so popup doesn't overflow viewport edges (10px margin)
+      const clampedLeft = Math.min(
+        Math.max(centerX, popupWidth / 2 + 10),
+        window.innerWidth - popupWidth / 2 - 10
+      )
+      setLinkPopupPos({ top: rect.top - 10, left: clampedLeft })
+    }
     setShowLinkDialog(true)
     setLinkUrl('')
     setTimeout(() => {
@@ -872,12 +903,12 @@ const MainToolbarContent = ({
           magnification
         })}
       >
-        <HeadingDropdownMenu levels={[1, 2, 3, 4, 5]} />
-        <FontFamilyDropdownMenu />
-        <ListDropdownMenu types={["bulletList", "orderedList", "taskList"]} />
-        <TableDropdownMenu />
-        <BlockquoteButton />
-        <CodeBlockButton />
+        <HeadingDropdownMenu levels={[1, 2, 3, 4, 5]} editor={editor} />
+        <FontFamilyDropdownMenu editor={editor} />
+        <ListDropdownMenu types={["bulletList", "orderedList", "taskList"]} editor={editor} />
+        <TableDropdownMenu editor={editor} />
+        <BlockquoteButton editor={editor} />
+        <CodeBlockButton editor={editor} />
       </Group>
 
       <Separator />
@@ -891,9 +922,9 @@ const MainToolbarContent = ({
           magnification
         })}
       >
-        <TextFormatDropdownMenu />
-        <MarkButton type="superscript" />
-        <MarkButton type="subscript" />
+        <TextFormatDropdownMenu editor={editor} />
+        <MarkButton type="superscript" editor={editor} />
+        <MarkButton type="subscript" editor={editor} />
       </Group>
 
       <Separator />
@@ -906,7 +937,7 @@ const MainToolbarContent = ({
           magnification
         })}
       >
-        <TextAlignDropdownMenu />
+        <TextAlignDropdownMenu editor={editor} />
       </Group>
 
       <Separator />
@@ -919,66 +950,19 @@ const MainToolbarContent = ({
           magnification
         })}
       >
-        <Popover open={showLinkDialog} onOpenChange={(open) => {
-          if (!open) handleCancelLink()
-        }}>
-          <PopoverTrigger asChild>
-            <Button
-              type="button"
-              data-style="ghost"
-              data-size="sm"
-              onClick={handleAddLink}
-              title="Add Link"
-              className="tiptap-button"
-            >
-              <LinkIcon className="tiptap-button-icon" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            side="top"
-            align="end"
-            sideOffset={8}
-            className="link-popover-content"
-            onOpenAutoFocus={(e) => {
-              e.preventDefault()
-              setTimeout(() => linkInputRef.current?.focus(), 0)
-            }}
+        <div ref={linkButtonRef} className="link-button-wrapper">
+          <Button
+            type="button"
+            data-style="ghost"
+            data-size="sm"
+            onClick={handleAddLink}
+            title="Add Link"
+            className="tiptap-button"
           >
-            <div className="link-dialog-content">
-              <input
-                ref={linkInputRef}
-                type="url"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                onKeyDown={handleLinkKeyDown}
-                placeholder="Enter URL..."
-                className="link-input"
-              />
-              <div className="link-dialog-actions">
-                <Button
-                  type="button"
-                  data-style="ghost"
-                  data-size="sm"
-                  onClick={handleSaveLink}
-                  disabled={!linkUrl.trim()}
-                  className="link-action-button"
-                >
-                  <CheckIcon className="tiptap-button-icon" />
-                </Button>
-                <Button
-                  type="button"
-                  data-style="ghost"
-                  data-size="sm"
-                  onClick={handleCancelLink}
-                  className="link-action-button"
-                >
-                  <XIcon className="tiptap-button-icon" />
-                </Button>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-        <ImageUploadButton text="Add" editor={editor} />
+            <LinkIcon className="tiptap-button-icon" />
+          </Button>
+        </div>
+        <ImageUploadButton text="Add" editor={editor} projectId={projectId} />
 
         {/* Embed Dropdown (YouTube, Instagram, Twitter) */}
         <DropdownMenu open={isEmbedOpen} onOpenChange={setIsEmbedOpen}>
@@ -1116,6 +1100,102 @@ const MainToolbarContent = ({
       </Group>
 
       <Spacer className={isScrollable ? 'scrollable-spacer' : ''} />
+
+      {/* Embed URL Dialog */}
+      {showEmbedDialog && (
+        <div className="embed-dialog-overlay" onClick={handleCancelEmbed}>
+          <div className="embed-dialog-content" onClick={(e) => e.stopPropagation()}>
+            <div className="embed-dialog-header">
+              <span className="embed-dialog-title">
+                {embedPlatform === 'youtube' ? 'YouTube' : embedPlatform === 'instagram' ? 'Instagram' : 'Twitter/X'} URL
+              </span>
+            </div>
+            <input
+              ref={embedInputRef}
+              type="url"
+              value={embedUrl}
+              onChange={(e) => setEmbedUrl(e.target.value)}
+              onKeyDown={handleEmbedKeyDown}
+              placeholder={
+                embedPlatform === 'youtube' ? 'https://youtube.com/watch?v=...' :
+                embedPlatform === 'instagram' ? 'https://instagram.com/p/...' :
+                'https://twitter.com/user/status/...'
+              }
+              className="embed-url-input"
+            />
+            <div className="embed-dialog-actions">
+              <Button
+                type="button"
+                data-style="ghost"
+                data-size="sm"
+                onClick={handleSaveEmbed}
+                disabled={!embedUrl.trim()}
+                className="link-action-button"
+              >
+                <CheckIcon className="tiptap-button-icon" />
+              </Button>
+              <Button
+                type="button"
+                data-style="ghost"
+                data-size="sm"
+                onClick={handleCancelEmbed}
+                className="link-action-button"
+              >
+                <XIcon className="tiptap-button-icon" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Link popup — rendered via Portal to document.body so it never affects toolbar layout */}
+      {showLinkDialog && linkPopupPos && ReactDOM.createPortal(
+        <div
+          ref={linkPopupRef}
+          className="link-inline-popup"
+          style={{
+            position: 'fixed',
+            top: linkPopupPos.top,
+            left: linkPopupPos.left,
+            transform: 'translateX(-50%) translateY(-100%)',
+            zIndex: 99999,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            ref={linkInputRef}
+            type="url"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            onKeyDown={handleLinkKeyDown}
+            placeholder="Enter URL..."
+            className="link-popup-input"
+            autoFocus
+          />
+          <div className="link-popup-actions">
+            <Button
+              type="button"
+              data-style="ghost"
+              data-size="sm"
+              onClick={handleSaveLink}
+              disabled={!linkUrl.trim()}
+              className="link-action-button"
+            >
+              <CheckIcon className="tiptap-button-icon" />
+            </Button>
+            <Button
+              type="button"
+              data-style="ghost"
+              data-size="sm"
+              onClick={handleCancelLink}
+              className="link-action-button"
+            >
+              <XIcon className="tiptap-button-icon" />
+            </Button>
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   )
 }
@@ -1140,7 +1220,8 @@ export function BlogSimpleEditor({
   onAriScoreChange,
   disableAutoScroll = false,
   onUserScrollChange,
-  titleElement
+  titleElement,
+  projectId,
 }: BlogSimpleEditorProps & { ref?: React.Ref<BlogSimpleEditorRef> }) {
   // const isMobile = useMobile() // Currently unused
   const toolbarRef = React.useRef<HTMLDivElement>(null)
@@ -2148,7 +2229,8 @@ export function BlogSimpleEditor({
           magnification,
           isScrollable,
           editor,
-          documentTitle
+          documentTitle,
+          projectId,
         }))}
       </div>
     </EditorContext.Provider>
