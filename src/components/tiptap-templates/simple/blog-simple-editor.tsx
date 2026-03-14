@@ -395,7 +395,23 @@ const MainToolbarContent = ({
   const [showEmbedDialog, setShowEmbedDialog] = React.useState(false)
   const [embedPlatform, setEmbedPlatform] = React.useState<'youtube' | 'instagram' | 'twitter' | null>(null)
   const [embedUrl, setEmbedUrl] = React.useState('')
+  const [embedPopupPos, setEmbedPopupPos] = React.useState<{ top: number; left: number } | null>(null)
   const embedInputRef = React.useRef<HTMLInputElement>(null)
+  const embedPopupRef = React.useRef<HTMLDivElement>(null)
+  const embedButtonRef = React.useRef<HTMLDivElement>(null)
+
+  // Close embed popup when clicking outside
+  React.useEffect(() => {
+    if (!showEmbedDialog) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (embedPopupRef.current && !embedPopupRef.current.contains(e.target as Node) &&
+          embedButtonRef.current && !embedButtonRef.current.contains(e.target as Node)) {
+        handleCancelEmbed()
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showEmbedDialog])
 
   // Export state
   const [isExportOpen, setIsExportOpen] = React.useState(false)
@@ -447,6 +463,16 @@ const MainToolbarContent = ({
 
   // Embed handlers (YouTube, Instagram, Twitter)
   const handleSelectPlatform = (platform: 'youtube' | 'instagram' | 'twitter') => {
+    if (embedButtonRef.current) {
+      const rect = embedButtonRef.current.getBoundingClientRect()
+      const popupWidth = 300
+      const centerX = rect.left + rect.width / 2
+      const clampedLeft = Math.min(
+        Math.max(centerX, popupWidth / 2 + 10),
+        window.innerWidth - popupWidth / 2 - 10
+      )
+      setEmbedPopupPos({ top: rect.top - 10, left: clampedLeft })
+    }
     setEmbedPlatform(platform)
     setIsEmbedOpen(false)
     setShowEmbedDialog(true)
@@ -965,6 +991,7 @@ const MainToolbarContent = ({
         <ImageUploadButton text="Add" editor={editor} projectId={projectId} />
 
         {/* Embed Dropdown (YouTube, Instagram, Twitter) */}
+        <div ref={embedButtonRef} style={{ display: 'inline-flex' }}>
         <DropdownMenu open={isEmbedOpen} onOpenChange={setIsEmbedOpen}>
           <DropdownMenuTrigger asChild>
             <Button
@@ -1032,6 +1059,7 @@ const MainToolbarContent = ({
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
 
         {/* Export Dropdown */}
         <DropdownMenu open={isExportOpen} onOpenChange={setIsExportOpen}>
@@ -1101,51 +1129,57 @@ const MainToolbarContent = ({
 
       <Spacer className={isScrollable ? 'scrollable-spacer' : ''} />
 
-      {/* Embed URL Dialog */}
-      {showEmbedDialog && (
-        <div className="embed-dialog-overlay" onClick={handleCancelEmbed}>
-          <div className="embed-dialog-content" onClick={(e) => e.stopPropagation()}>
-            <div className="embed-dialog-header">
-              <span className="embed-dialog-title">
-                {embedPlatform === 'youtube' ? 'YouTube' : embedPlatform === 'instagram' ? 'Instagram' : 'Twitter/X'} URL
-              </span>
-            </div>
-            <input
-              ref={embedInputRef}
-              type="url"
-              value={embedUrl}
-              onChange={(e) => setEmbedUrl(e.target.value)}
-              onKeyDown={handleEmbedKeyDown}
-              placeholder={
-                embedPlatform === 'youtube' ? 'https://youtube.com/watch?v=...' :
-                embedPlatform === 'instagram' ? 'https://instagram.com/p/...' :
-                'https://twitter.com/user/status/...'
-              }
-              className="embed-url-input"
-            />
-            <div className="embed-dialog-actions">
-              <Button
-                type="button"
-                data-style="ghost"
-                data-size="sm"
-                onClick={handleSaveEmbed}
-                disabled={!embedUrl.trim()}
-                className="link-action-button"
-              >
-                <CheckIcon className="tiptap-button-icon" />
-              </Button>
-              <Button
-                type="button"
-                data-style="ghost"
-                data-size="sm"
-                onClick={handleCancelEmbed}
-                className="link-action-button"
-              >
-                <XIcon className="tiptap-button-icon" />
-              </Button>
-            </div>
+      {/* Embed URL popup — Portal to document.body */}
+      {showEmbedDialog && embedPopupPos && ReactDOM.createPortal(
+        <div
+          ref={embedPopupRef}
+          className="link-inline-popup"
+          style={{
+            position: 'fixed',
+            top: embedPopupPos.top,
+            left: embedPopupPos.left,
+            transform: 'translateX(-50%) translateY(-100%)',
+            zIndex: 99999,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            ref={embedInputRef}
+            type="url"
+            value={embedUrl}
+            onChange={(e) => setEmbedUrl(e.target.value)}
+            onKeyDown={handleEmbedKeyDown}
+            placeholder={
+              embedPlatform === 'youtube' ? 'https://youtube.com/watch?v=...' :
+              embedPlatform === 'instagram' ? 'https://instagram.com/p/...' :
+              'https://twitter.com/user/status/...'
+            }
+            className="link-popup-input"
+            autoFocus
+          />
+          <div className="link-popup-actions">
+            <Button
+              type="button"
+              data-style="ghost"
+              data-size="sm"
+              onClick={handleSaveEmbed}
+              disabled={!embedUrl.trim()}
+              className="link-action-button"
+            >
+              <CheckIcon className="tiptap-button-icon" />
+            </Button>
+            <Button
+              type="button"
+              data-style="ghost"
+              data-size="sm"
+              onClick={handleCancelEmbed}
+              className="link-action-button"
+            >
+              <XIcon className="tiptap-button-icon" />
+            </Button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Link popup — rendered via Portal to document.body so it never affects toolbar layout */}
