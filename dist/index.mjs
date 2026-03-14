@@ -54147,7 +54147,7 @@ const qG = "data:application/octet-stream;base64,UklWRQcAvcx4xAHsAe4DrQS2BMcE5QT
               isLoadingImages: P,
               onUpload: x,
               onAIRequest: M,
-              titleElement: /* @__PURE__ */ fe("div", { className: "px-8 pt-5 pb-0", children: [
+              titleElement: /* @__PURE__ */ fe("div", { className: "px-8 pt-8 pb-0", children: [
                 Y || s ? /* @__PURE__ */ E("div", { className: "mb-4 w-full rounded-lg overflow-hidden", style: { aspectRatio: "16/9" }, children: /* @__PURE__ */ E(XG, {}) }) : J ? /* @__PURE__ */ fe("div", { className: "mb-4 w-full rounded-lg overflow-hidden group relative cursor-pointer", style: { aspectRatio: "16/9" }, onClick: G, children: [
                   /* @__PURE__ */ E(
                     "img",

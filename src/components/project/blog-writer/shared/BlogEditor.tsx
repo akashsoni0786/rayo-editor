@@ -4004,7 +4004,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
             projectId={projectId}
             images={images} isLoadingImages={isLoadingImages} onUpload={onUpload} onAIRequest={onAIRequest}
             titleElement={
-              <div className="px-8 pt-5 pb-0">
+              <div className="px-8 pt-8 pb-0">
                 {(isGeneratingImage || isStreaming) ? (
                   <div className="mb-4 w-full rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
                     <ImageGenerationLoader />
