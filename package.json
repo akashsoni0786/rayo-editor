@@ -1,6 +1,6 @@
 {
   "name": "rayo-editor",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Standalone npm module for Rayo Blog Editor",
   "type": "module",
   "main": "./dist/index.js",
