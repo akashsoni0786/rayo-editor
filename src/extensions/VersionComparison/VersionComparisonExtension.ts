@@ -5,7 +5,6 @@
 
 import { Extension } from '@tiptap/core';
 import { Plugin, PluginKey } from 'prosemirror-state';
-// @ts-ignore
 import HtmlDiff from 'htmldiff-js';
 
 declare module '@tiptap/core' {

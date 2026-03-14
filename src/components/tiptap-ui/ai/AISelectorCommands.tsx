@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Editor } from '@tiptap/react';
 import { RefreshCcw, CheckCheck, ArrowDownWideNarrow, WrapText, StepForward } from 'lucide-react';

@@ -1,0 +1,557 @@
+{
+  "dashboards": [
+    {
+      "name": "User Acquisition & Authentication",
+      "description": "Track user signup, login, and onboarding metrics",
+      "events": [
+        {
+          "event_name": "Sign Up",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["method"]
+        },
+        {
+          "event_name": "Sign In",
+          "chart_type": "line_chart", 
+          "time_period": "30d",
+          "breakdown": ["method"]
+        },
+        {
+          "event_name": "Sign Up Failed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["error_message"]
+        },
+        {
+          "event_name": "Sign In Failed", 
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["error_message"]
+        },
+        {
+          "event_name": "Modal Opened",
+          "chart_type": "bar_chart",
+          "time_period": "7d",
+          "breakdown": ["modal_type"],
+          "filters": [{"property": "modal_type", "operator": "equals", "value": "confirmation"}]
+        }
+      ],
+      "cohort_analysis": {
+        "signup_to_first_project": {
+          "conversion_event": "Project Created",
+          "time_windows": ["1h", "24h", "7d", "30d"]
+        }
+      }
+    },
+    {
+      "name": "Project Management & Content Creation",
+      "description": "Monitor project creation and blog generation workflows",
+      "events": [
+        {
+          "event_name": "Project Creation Started",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["source", "trigger"]
+        },
+        {
+          "event_name": "Add Project Modal Opened",
+          "chart_type": "line_chart",
+          "time_period": "7d",
+          "metrics": ["count"]
+        },
+        {
+          "event_name": "Website Analysis Started",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["url_format"]
+        },
+        {
+          "event_name": "Website Analysis Success",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "metrics": ["count", "avg(analysis_time_ms)", "avg(services_detected)"]
+        },
+        {
+          "event_name": "Website Analysis Failed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["error_step"],
+          "metrics": ["count", "avg(analysis_time_ms)"]
+        },
+        {
+          "event_name": "Project Details Step Completed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["url_has_protocol"]
+        },
+        {
+          "event_name": "Project Services Step Completed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "metrics": ["count", "avg(total_services)", "avg(ai_generated_services)", "avg(user_added_services)"]
+        },
+        {
+          "event_name": "Project Audience Step Completed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["gender_selection"]
+        },
+        {
+          "event_name": "Brand Tone Analysis Started",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["has_cached_result"],
+          "metrics": ["count", "avg(text_length)", "avg(word_count)"]
+        },
+        {
+          "event_name": "Brand Tone Analysis Success",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "metrics": ["count", "avg(analysis_time_ms)", "avg(disabled_tones_count)"]
+        },
+        {
+          "event_name": "Brand Tone Analysis Failed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["error_type"]
+        },
+        {
+          "event_name": "Brand Tone Manually Changed",
+          "chart_type": "bar_chart",
+          "time_period": "7d",
+          "breakdown": ["tone_category", "is_formality_change"]
+        },
+        {
+          "event_name": "Project Brand Step Completed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "metrics": ["count", "avg(completion_time_ms)", "avg(text_length)"]
+        },
+        {
+          "event_name": "Project Created",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["business_type"]
+        },
+        {
+          "event_name": "Blog Generation Started",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["generation_type"]
+        },
+        {
+          "event_name": "Blog Generated",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "metrics": ["count", "avg(generation_time)", "avg(word_count)"]
+        },
+        {
+          "event_name": "Blog Generation Failed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["error_message"]
+        },
+        {
+          "event_name": "Blog Card Clicked",
+          "chart_type": "line_chart",
+          "time_period": "7d",
+          "breakdown": ["blog_source", "blog_status"]
+        },
+        {
+          "event_name": "Modal Confirmed",
+          "chart_type": "funnel",
+          "time_period": "7d",
+          "breakdown": ["action_type"],
+          "metrics": ["count", "avg(time_to_decision_ms)"]
+        }
+      ],
+      "funnel_analysis": {
+        "project_creation_funnel": {
+          "steps": [
+            "Project Creation Started",
+            "Add Project Modal Opened",
+            "Website Analysis Started",
+            "Website Analysis Success",
+            "Project Details Step Completed",
+            "Project Services Step Completed",
+            "Project Audience Step Completed",
+            "Project Brand Step Completed",
+            "Project Creation Completed"
+          ],
+          "time_window": "1h"
+        },
+        "blog_creation_funnel": {
+          "steps": [
+            "Blog Generation Started",
+            "Primary Keyword Modal Opened",
+            "Primary Keyword Modal Closed",
+            "Blog Category Generation Started",
+            "Blog Generated"
+          ],
+          "time_window": "1d"
+        }
+      }
+    },
+    {
+      "name": "User Engagement & Content Quality",
+      "description": "Track user interaction depth and content creation patterns",
+      "events": [
+        {
+          "event_name": "Blog Editor Focused",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["editor_type"]
+        },
+        {
+          "event_name": "Blog Editor Session",
+          "chart_type": "histogram",
+          "time_period": "7d",
+          "metrics": ["avg(session_duration_ms)", "avg(final_word_count)", "avg(actions_per_minute)"]
+        },
+        {
+          "event_name": "Blog Editor Content Changed",
+          "chart_type": "line_chart",
+          "time_period": "7d",
+          "metrics": ["count", "avg(word_count)"]
+        },
+        {
+          "event_name": "Blog Editor Image Dropped",
+          "chart_type": "bar_chart",
+          "time_period": "30d",
+          "breakdown": ["file_type", "insertion_method"]
+        },
+        {
+          "event_name": "Keyword Search",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["search_type"],
+          "metrics": ["count", "avg(results_count)", "avg(search_time)"]
+        }
+      ]
+    },
+    {
+      "name": "Revenue & Business Metrics",
+      "description": "Monitor payment flows and subscription metrics", 
+      "events": [
+        {
+          "event_name": "Payment Initiated",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["plan"],
+          "metrics": ["count", "sum(amount)"]
+        },
+        {
+          "event_name": "Payment Completed",
+          "chart_type": "line_chart", 
+          "time_period": "30d",
+          "breakdown": ["plan"],
+          "metrics": ["count", "sum(amount)"]
+        },
+        {
+          "event_name": "Payment Failed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["error_message"]
+        }
+      ],
+      "revenue_analysis": {
+        "monthly_recurring_revenue": {
+          "events": ["Payment Completed"],
+          "property_filters": [{"property": "plan", "operator": "contains", "value": "subscription"}],
+          "time_window": "monthly"
+        },
+        "conversion_funnel": {
+          "steps": [
+            "Payment Initiated",
+            "Payment Completed"
+          ],
+          "breakdown": ["plan"],
+          "time_window": "7d"
+        }
+      }
+    },
+    {
+      "name": "Profile & Settings Management",
+      "description": "Track user profile updates and settings changes",
+      "events": [
+        {
+          "event_name": "Profile Field Changed",
+          "chart_type": "bar_chart",
+          "time_period": "30d",
+          "breakdown": ["field_name", "page_section"]
+        },
+        {
+          "event_name": "Profile Update Started",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "metrics": ["count"]
+        },
+        {
+          "event_name": "Profile Update Success",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "metrics": ["count", "avg(update_time_ms)"]
+        },
+        {
+          "event_name": "Profile Update Failed",
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["error_message"]
+        },
+        {
+          "event_name": "Profile Country Code Changed",
+          "chart_type": "bar_chart", 
+          "time_period": "30d",
+          "breakdown": ["from_code", "to_code"]
+        }
+      ]
+    },
+    {
+      "name": "WordPress Integration & Publishing",
+      "description": "Monitor WordPress connections and publishing workflows",
+      "events": [
+        {
+          "event_name": "WordPress Connected",
+          "chart_type": "line_chart",
+          "time_period": "30d"
+        },
+        {
+          "event_name": "WordPress Connection Failed", 
+          "chart_type": "line_chart",
+          "time_period": "30d",
+          "breakdown": ["error_message"]
+        },
+        {
+          "event_name": "WordPress Disconnected",
+          "chart_type": "line_chart", 
+          "time_period": "30d"
+        }
+      ]
+    }
+  ],
+  "insights": [
+    {
+      "name": "Authentication Success Rate",
+      "description": "Track signup and login success rates",
+      "calculation": {
+        "type": "ratio",
+        "numerator": {"event": "Sign Up", "aggregation": "count"},
+        "denominator": {
+          "events": ["Sign Up", "Sign Up Failed"], 
+          "aggregation": "count"
+        }
+      },
+      "target_value": 0.85,
+      "alert_threshold": 0.75
+    },
+    {
+      "name": "Blog Generation Success Rate", 
+      "description": "Track blog generation completion rate",
+      "calculation": {
+        "type": "ratio",
+        "numerator": {"event": "Blog Generated", "aggregation": "count"},
+        "denominator": {
+          "events": ["Blog Generation Started"],
+          "aggregation": "count" 
+        }
+      },
+      "target_value": 0.9,
+      "alert_threshold": 0.8
+    },
+    {
+      "name": "Payment Conversion Rate",
+      "description": "Track payment completion rate", 
+      "calculation": {
+        "type": "ratio",
+        "numerator": {"event": "Payment Completed", "aggregation": "count"},
+        "denominator": {"events": ["Payment Initiated"], "aggregation": "count"}
+      },
+      "target_value": 0.95,
+      "alert_threshold": 0.9
+    },
+    {
+      "name": "Average Blog Session Duration",
+      "description": "Track user engagement in blog editor",
+      "calculation": {
+        "type": "average",
+        "event": "Blog Editor Session",
+        "property": "session_duration_ms"
+      },
+      "target_value": 300000,
+      "alert_threshold": 120000
+    },
+    {
+      "name": "Modal Abandonment Rate", 
+      "description": "Track how often users abandon modals without action",
+      "calculation": {
+        "type": "ratio",
+        "numerator": {"event": "Modal Dismissed", "aggregation": "count"},
+        "denominator": {"events": ["Modal Opened"], "aggregation": "count"}
+      },
+      "target_value": 0.3,
+      "alert_threshold": 0.5
+    },
+    {
+      "name": "Project Creation Success Rate",
+      "description": "Track project setup completion rate from start to finish",
+      "calculation": {
+        "type": "ratio",
+        "numerator": {"event": "Project Creation Completed", "aggregation": "count"},
+        "denominator": {"events": ["Project Creation Started"], "aggregation": "count"}
+      },
+      "target_value": 0.75,
+      "alert_threshold": 0.6
+    },
+    {
+      "name": "Website Analysis Success Rate",
+      "description": "Track website analysis completion rate",
+      "calculation": {
+        "type": "ratio",
+        "numerator": {"event": "Website Analysis Success", "aggregation": "count"},
+        "denominator": {"events": ["Website Analysis Started"], "aggregation": "count"}
+      },
+      "target_value": 0.9,
+      "alert_threshold": 0.8
+    },
+    {
+      "name": "Average Project Setup Time",
+      "description": "Track time from project creation start to completion",
+      "calculation": {
+        "type": "funnel_time",
+        "start_event": "Project Creation Started",
+        "end_event": "Project Creation Completed"
+      },
+      "target_value": 180000,
+      "alert_threshold": 300000
+    },
+    {
+      "name": "Brand Tone Analysis Success Rate",
+      "description": "Track brand tone analysis completion rate",
+      "calculation": {
+        "type": "ratio",
+        "numerator": {"event": "Brand Tone Analysis Success", "aggregation": "count"},
+        "denominator": {"events": ["Brand Tone Analysis Started"], "aggregation": "count"}
+      },
+      "target_value": 0.9,
+      "alert_threshold": 0.8
+    }
+  ],
+  "alerts": [
+    {
+      "name": "Authentication Failure Spike",
+      "condition": {
+        "event": "Sign In Failed",
+        "threshold": 20,
+        "time_window": "1h",
+        "comparison": "greater_than"
+      },
+      "notification": {
+        "channels": ["email", "slack"],
+        "message": "Authentication failures have exceeded normal levels"
+      }
+    },
+    {
+      "name": "Blog Generation Failure Rate High",
+      "condition": {
+        "events": ["Blog Generation Failed"],
+        "threshold": 0.2,
+        "time_window": "4h", 
+        "comparison": "ratio_greater_than",
+        "baseline_event": "Blog Generation Started"
+      },
+      "notification": {
+        "channels": ["email", "slack"],
+        "message": "Blog generation failure rate is above 20%"
+      }
+    },
+    {
+      "name": "Payment Processing Issues",
+      "condition": {
+        "event": "Payment Failed", 
+        "threshold": 5,
+        "time_window": "1h",
+        "comparison": "greater_than"
+      },
+      "notification": {
+        "channels": ["email", "slack", "pagerduty"],
+        "message": "Multiple payment failures detected - urgent review needed"
+      }
+    },
+    {
+      "name": "Low User Engagement",
+      "condition": {
+        "event": "Blog Editor Session",
+        "property": "session_duration_ms",
+        "threshold": 60000,
+        "time_window": "24h",
+        "comparison": "average_less_than"
+      },
+      "notification": {
+        "channels": ["email"],
+        "message": "Average blog editor session duration is below 1 minute"
+      }
+    },
+    {
+      "name": "High Website Analysis Failure Rate",
+      "condition": {
+        "events": ["Website Analysis Failed"],
+        "threshold": 0.3,
+        "time_window": "2h",
+        "comparison": "ratio_greater_than",
+        "baseline_event": "Website Analysis Started"
+      },
+      "notification": {
+        "channels": ["email", "slack"],
+        "message": "Website analysis failure rate is above 30% - investigate API issues"
+      }
+    },
+    {
+      "name": "Project Creation Drop-off",
+      "condition": {
+        "events": ["Project Creation Started"],
+        "threshold": 0.4,
+        "time_window": "4h",
+        "comparison": "ratio_less_than",
+        "completion_event": "Project Creation Completed"
+      },
+      "notification": {
+        "channels": ["email"],
+        "message": "Project creation completion rate has dropped below 40%"
+      }
+    },
+    {
+      "name": "Brand Tone Analysis Issues",
+      "condition": {
+        "events": ["Brand Tone Analysis Failed"],
+        "threshold": 0.2,
+        "time_window": "2h",
+        "comparison": "ratio_greater_than",
+        "baseline_event": "Brand Tone Analysis Started"
+      },
+      "notification": {
+        "channels": ["email", "slack"],
+        "message": "Brand tone analysis failure rate is above 20% - investigate API issues"
+      }
+    }
+  ],
+  "retention_cohorts": [
+    {
+      "name": "User Signup to First Project",
+      "starting_event": "Sign Up",
+      "return_event": "Project Created", 
+      "time_windows": ["1h", "1d", "3d", "7d", "30d"]
+    },
+    {
+      "name": "Project Creation to First Blog",
+      "starting_event": "Project Created",
+      "return_event": "Blog Generation Started",
+      "time_windows": ["1h", "1d", "3d", "7d", "14d"]
+    },
+    {
+      "name": "First Blog to Second Blog", 
+      "starting_event": "Blog Generated",
+      "return_event": "Blog Generation Started",
+      "time_windows": ["1d", "3d", "7d", "14d", "30d"]
+    }
+  ]
+}

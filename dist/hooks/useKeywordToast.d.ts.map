@@ -1,0 +1,1 @@
+{"version":3,"file":"useKeywordToast.d.ts","sourceRoot":"","sources":["../../src/hooks/useKeywordToast.tsx"],"names":[],"mappings":"AAEA,MAAM,WAAW,mBAAmB;IAClC,KAAK,CAAC,EAAE,MAAM,CAAC;IACf,WAAW,EAAE,MAAM,CAAC;IACpB,OAAO,CAAC,EAAE,SAAS,GAAG,aAAa,CAAC;CACrC;AAED,MAAM,WAAW,eAAe;IAC9B,KAAK,EAAE,CAAC,OAAO,EAAE,mBAAmB,KAAK,IAAI,CAAC;CAC/C;AAED,wBAAgB,eAAe,IAAI,eAAe,CA+DjD"}

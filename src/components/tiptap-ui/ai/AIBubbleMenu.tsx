@@ -1,7 +1,5 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { Editor } from '@tiptap/react';
-import { BubbleMenu } from '../../tiptap-templates/simple/BubbleMenu';
+import { BubbleMenu, Editor } from '@tiptap/react';
 import { Button } from '../../ui/button';
 import { MagicIcon } from '../../tiptap-icons/magic-icon';
 import { useAICompletion } from './useAICompletion';
@@ -135,7 +133,7 @@ export const AIBubbleMenu: React.FC<AIBubbleMenuProps> = ({ editor }) => {
           editor.chain().unsetHighlight().run();
         },
       }}
-      shouldShow={({ editor, state, from, to }: any) => {
+      shouldShow={({ editor, state, from, to }) => {
         const { selection } = state;
         const { empty } = selection;
         
@@ -186,7 +184,7 @@ export const AIBubbleMenu: React.FC<AIBubbleMenuProps> = ({ editor }) => {
                     autoFocus
                     placeholder={hasCompletion ? "Tell AI what to do next" : "Ask AI to edit or generate..."}
                     className="w-full px-4 py-3 text-sm border-0 focus:outline-none focus:ring-0 placeholder-gray-500"
-                    onFocus={() => addAIHighlight()}
+                    onFocus={() => addAIHighlight(editor)}
                   />
                   <Button
                     size="sm"

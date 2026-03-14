@@ -382,7 +382,7 @@ export function AnimatedToolbar({
         userSelect: isDragging ? 'none' : 'auto',
         ...props.style
       }}
-      {...(props as any)}
+      {...props}
     >
       {children}
     </motion.div>

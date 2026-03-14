@@ -57,7 +57,7 @@ export const DragHandleExtension = Extension.create<DragHandleOptions>({
               // Create a selection for the node
               view.dispatch(
                 view.state.tr.setSelection(
-                  (editor.state.selection.constructor as any).near($pos)
+                  editor.state.selection.constructor.near($pos)
                 )
               )
 

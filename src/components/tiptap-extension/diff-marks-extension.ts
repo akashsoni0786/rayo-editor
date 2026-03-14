@@ -72,15 +72,15 @@ export const DiffInsertion = Mark.create({
     return {
       setDiffInsertion:
         () =>
-        ({ commands }: { commands: any }) => {
+        ({ commands }) => {
           return commands.setMark(this.name);
         },
       unsetDiffInsertion:
         () =>
-        ({ commands }: { commands: any }) => {
+        ({ commands }) => {
           return commands.unsetMark(this.name);
         },
-    } as any;
+    };
   },
 });
 
@@ -155,14 +155,14 @@ export const DiffDeletion = Mark.create({
     return {
       setDiffDeletion:
         () =>
-        ({ commands }: { commands: any }) => {
+        ({ commands }) => {
           return commands.setMark(this.name);
         },
       unsetDiffDeletion:
         () =>
-        ({ commands }: { commands: any }) => {
+        ({ commands }) => {
           return commands.unsetMark(this.name);
         },
-    } as any;
+    };
   },
 });

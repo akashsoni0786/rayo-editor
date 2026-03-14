@@ -30,7 +30,24 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src/index.ts",
+    "src/components/project/blog-writer/**/*",
+    "src/components/tiptap-templates/**/*",
+    "src/components/tiptap-ui/**/*",
+    "src/components/tiptap-ui-primitive/**/*",
+    "src/components/tiptap-extension/**/*",
+    "src/components/tiptap-icons/**/*",
+    "src/components/tiptap-node/**/*",
+    "src/components/shared/**/*",
+    "src/components/ui/**/*",
+    "src/extensions/**/*",
+    "src/hooks/**/*",
+    "src/lib/**/*",
+    "src/utils/**/*",
+    "src/types/**/*",
+    "src/constants/**/*",
+    "src/styles/**/*",
+    "src/vite-env.d.ts"
   ],
   "exclude": [
     "node_modules",

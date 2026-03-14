@@ -254,7 +254,7 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({
           unit: '%',
           width: cropWidthPercent,
         },
-        NaN, // No fixed aspect ratio - allow free cropping
+        undefined, // No fixed aspect ratio - allow free cropping
         width,
         height
       ),

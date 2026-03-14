@@ -1,0 +1,14 @@
+/* Preload background image */
+.bg-preload {
+  background-image: url('https://cdn.rayo.work/Rayo_assests/BG_idfnxk.avif') !important;
+}
+
+/* Create a hidden preload element */
+body::after {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: -1;
+  content: url('https://cdn.rayo.work/Rayo_assests/BG_idfnxk.avif');
+}

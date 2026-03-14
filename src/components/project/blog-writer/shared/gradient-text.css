@@ -1,0 +1,20 @@
+/* Animated Gradient Text Effect - Left to Right */
+.gradient-text-ltr {
+    background: linear-gradient(
+        90deg,
+        #DF5B45 0%,
+        #8451F3 50%,
+        #A597FF 75%,
+        #DF5B45 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-move-ltr 3s linear infinite;
+}
+
+@keyframes gradient-move-ltr {
+    0% { background-position: 200% 50%; }
+    100% { background-position: 0% 50%; }
+}

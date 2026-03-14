@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Upload, Search, Link as LinkIcon, Loader2, ImageIcon, Grid, 
@@ -6,7 +5,11 @@ import {
   Check, Download, Image as LucideImage
 } from 'lucide-react';
 import { Editor } from '@tiptap/react';
-import { api } from '../../../services/api';
+import axios from 'axios';
+const api = {
+  get: <T = any>(url: string, config?: any) => axios.get<T>(url, config),
+  post: (url: string, data?: any, config?: any) => axios.post(url, data, config),
+};
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
@@ -407,7 +410,7 @@ export default function ImageGalleryDialog({
                                 altText: img.original_filename
                               }));
                             }}
-                            onDownload={(e: any) => {
+                            onDownload={(e) => {
                               e.stopPropagation();
                               window.open(img.url, '_blank');
                             }}

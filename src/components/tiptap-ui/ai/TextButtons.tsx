@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Editor } from '@tiptap/react';
 import { Bold, Italic, Underline, Strikethrough, Code, AlignLeft, AlignCenter, AlignRight, AlignJustify, Link } from 'lucide-react';

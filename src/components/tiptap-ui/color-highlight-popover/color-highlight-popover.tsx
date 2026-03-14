@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react"
 import { isNodeSelection, type Editor } from "@tiptap/react"
 
@@ -128,7 +127,7 @@ export function ColorHighlightPopoverContent({
     containerRef,
     items: menuItems,
     orientation: "both",
-    onSelect: (item: any) => {
+    onSelect: (item) => {
       if (item.value === "none") {
         removeHighlight()
       }

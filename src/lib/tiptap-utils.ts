@@ -163,7 +163,7 @@ export const handleImageUpload = async (
       
       const response = await uploadToCloudinary(
         file,
-        cloudinaryConfig.cloudName!,
+        cloudinaryConfig.cloudName,
         cloudinaryConfig.uploadPreset
       )
       

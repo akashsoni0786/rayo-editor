@@ -1,0 +1,678 @@
+================================================================================
+AI REVIEW MODE - COMPLETE FORMATTING & TROUBLESHOOTING GUIDE
+================================================================================
+
+This document is a COMPLETE reference for all formatting/styling cases in the
+AI Review Mode. Use this as a troubleshooting guide if issues arise.
+
+PROJECT STRUCTURE:
+- AgentChatPanel.tsx: Main logic for applying AI changes
+- BlogEditor.tsx: Editor wrapper with sync functions
+- blog-simple-editor.tsx: TipTap editor configuration
+- RayoBlogPage.tsx: Accept/Reject handlers
+- table-extension.ts: Custom table TipTap extension
+- resizable-image-extension.ts: Custom image TipTap extension
+- code-block-extension.ts: Custom code block TipTap extension
+- table-node.scss: Table pending state CSS
+- resizable-image-node.scss: Image pending state CSS
+- blog-simple-editor.scss: Code block pending state CSS
+
+================================================================================
+1. TEXT COMPARISON (Regular Text Changes)
+================================================================================
+
+SCENARIO: User selects text and AI replaces it with different text
+
+VISUAL TREATMENT:
+- OLD TEXT: Red background highlight (#fecaca), shown with strikethrough
+- NEW TEXT: Green background highlight (#c7f0d6ff), shown normally
+
+HOW IT WORKS:
+1. Old content is marked with red highlight using setHighlight({ color: '#fecaca' })
+2. New content is inserted AFTER the old content
+3. New content is marked with green highlight using setHighlight({ color: '#c7f0d6ff' })
+
+ACCEPT ACTION:
+- Delete all text with red highlight (#fecaca)
+- Remove highlight mark from green text (keep the text)
+
+REJECT ACTION:
+- Delete all text with green highlight (#c7f0d6ff)
+- Remove highlight mark from red text (keep the text)
+
+CODE LOCATION: AgentChatPanel.tsx, around line 4650-4680
+
+================================================================================
+2. TEXT DELETION (Delete Text Only)
+================================================================================
+
+SCENARIO: User selects text and AI deletes it (new_content is empty)
+
+VISUAL TREATMENT:
+- OLD TEXT: Red background highlight (#fecaca), shown with strikethrough
+
+HOW IT WORKS:
+1. Old content is marked with red highlight using setHighlight({ color: '#fecaca' })
+2. No new content is inserted (isDeletionOnly = true)
+
+ACCEPT ACTION:
+- Delete all text with red highlight
+
+REJECT ACTION:
+- Remove highlight mark from red text (keep the text)
+
+CODE LOCATION: AgentChatPanel.tsx, around line 3900-4000
+
+================================================================================
+3. IMAGE OPERATIONS
+================================================================================
+
+3A. IMAGE DELETION
+------------------
+SCENARIO: AI deletes an existing image
+
+VISUAL TREATMENT:
+- Image wrapper gets class "image-view--pending-delete"
+- Red background: rgba(254, 202, 202, 0.3)
+- Red border: 2px solid #EF4444
+- Toolbar hidden
+
+HOW IT WORKS:
+1. Find image node in the range
+2. Set pendingDelete: true via setNodeMarkup
+
+ACCEPT: Delete the image node
+REJECT: Remove pendingDelete attribute (keep image)
+
+3B. IMAGE INSERTION
+-------------------
+SCENARIO: AI adds a new image
+
+VISUAL TREATMENT:
+- Image wrapper gets class "image-view--pending-insert"
+- Green background: #D5F6E7
+- Green border: 2px solid #167858
+- Toolbar hidden
+
+HOW IT WORKS:
+1. Parse image from new_content HTML
+2. Create image node with pendingInsert: true
+3. Insert at appropriate position
+
+ACCEPT: Remove pendingInsert attribute (keep image)
+REJECT: Delete the image node
+
+3C. IMAGE REPLACEMENT
+---------------------
+SCENARIO: AI replaces one image with another
+
+VISUAL TREATMENT:
+- Old image: pendingDelete=true (red styling)
+- New image: pendingInsert=true (green styling)
+- 8px gap between stacked images
+
+CODE LOCATION: AgentChatPanel.tsx, around line 3700-3900
+
+CSS FILE: src/components/tiptap-node/resizable-image-node/resizable-image-node.scss
+
+RELEVANT CSS (lines 16-166):
+```scss
+.image-view {
+  // Green boundary for pending insert images
+  &--pending-insert {
+    position: relative;
+    background: #D5F6E7 !important;
+    padding: 5px !important;
+    margin-top: 8px !important;
+    outline: 2px solid #167858;
+    outline-offset: 0;
+
+    .image-toolbar { display: none; }
+  }
+
+  // Red boundary for pending delete images
+  &--pending-delete {
+    position: relative;
+    background: rgba(254, 202, 202, 0.3) !important;
+    padding: 8px !important;
+    margin-bottom: 8px !important;
+    outline: 2px solid #EF4444;
+    outline-offset: 0;
+
+    .image-toolbar { display: none; }
+  }
+}
+```
+
+TSX FILE: src/components/tiptap-node/resizable-image-node/resizable-image-node.tsx
+
+RELEVANT CODE (wrapperStyle useMemo, lines 187-220):
+```tsx
+const wrapperStyle = useMemo(() => {
+  if (pendingInsert || pendingDelete) {
+    const imageWidth = imgAttrs.style?.width
+    const isCentered = align === 'center'
+    return {
+      float: align === 'left' ? 'left' : align === 'right' ? 'right' : undefined,
+      margin: isCentered ? '0 auto' : undefined,
+      display: isCentered ? 'block' : 'inline-block',
+      width: imageWidth ?? 'auto',
+    }
+  }
+  // ... normal state handling
+}, [align, imgAttrs.style?.width, pendingInsert, pendingDelete])
+```
+
+================================================================================
+4. CODE BLOCK OPERATIONS
+================================================================================
+
+4A. CODE BLOCK DELETION
+-----------------------
+SCENARIO: AI deletes an existing code block
+
+VISUAL TREATMENT:
+- Code block (<pre>) gets data-pending-delete="true" attribute
+- CSS shows: red border, red background, strikethrough on code
+
+CSS SELECTORS (blog-simple-editor.scss):
+```scss
+pre[data-pending-delete="true"] {
+  border: 2px solid #ef4444;
+  background-color: rgba(254, 202, 202, 0.3);
+}
+pre[data-pending-delete="true"] code {
+  text-decoration: line-through;
+  text-decoration-color: #ef4444;
+}
+```
+
+HOW IT WORKS:
+1. Detect code block in old_content (isCodeBlockOperation)
+2. Set pendingDelete: true via setNodeMarkup on codeBlock node
+
+ACCEPT: Delete the codeBlock node
+REJECT: Remove pendingDelete attribute (keep code block)
+
+4B. CODE BLOCK INSERTION
+------------------------
+SCENARIO: AI adds a new code block
+
+VISUAL TREATMENT:
+- Code block gets data-pending-insert="true" attribute
+- CSS shows: green border, green background
+
+CSS SELECTORS:
+```scss
+pre[data-pending-insert="true"] {
+  border: 2px solid #22c55e;
+  background-color: rgba(187, 247, 208, 0.3);
+}
+```
+
+CODE LOCATION: AgentChatPanel.tsx, around line 3000-3100
+
+================================================================================
+5. TABLE OPERATIONS
+================================================================================
+
+5A. TABLE DELETION
+------------------
+SCENARIO: AI deletes an existing table
+
+VISUAL TREATMENT:
+- Table gets data-pending-delete="true" attribute
+- Red border: 2px solid #EE877B
+- Red background on all cells
+- Red strikethrough on all text in cells
+- pointer-events: none (disables interactions)
+
+5B. TABLE INSERTION
+-------------------
+SCENARIO: AI adds a new table
+
+VISUAL TREATMENT:
+- Table gets data-pending-insert="true" attribute
+- Green border: 2px solid #22c55e
+- Green background: #D5F6E7
+- "New table" label at top-left
+
+5C. TABLE REPLACEMENT (Comparison)
+----------------------------------
+SCENARIO: AI replaces one table with a different table
+
+VISUAL TREATMENT:
+- OLD TABLE: data-pending-delete="true" (red styling, strikethrough)
+- NEW TABLE: data-pending-insert="true" (green styling, "New table" label)
+
+HOW IT WORKS:
+1. Detect table replacement (isTableReplacement)
+2. Mark old table with pendingDelete: true via tr.setNodeMarkup
+3. Parse new table from new_content
+4. Create new table node with pendingInsert: true
+5. Insert new table after old table
+6. Apply DOM attributes directly (TipTap TableView workaround)
+7. Check ProseMirror state before applying (for undo support)
+
+CODE LOCATION: AgentChatPanel.tsx
+
+RELEVANT CODE (Table Handler - lines 1692-1720):
+```typescript
+tableEditor.chain()
+  .focus(null, { scrollIntoView: false })
+  .command(({ tr, state: s }: any) => {
+    // Mark old table with pendingDelete
+    const oldTableNode = s.doc.nodeAt(oldTablePos);
+    if (oldTableNode && oldTableNode.type.name === 'table') {
+      tr.setNodeMarkup(oldTablePos, undefined, {
+        ...oldTableNode.attrs,
+        pendingDelete: true,
+      });
+    }
+
+    // Create new table with pendingInsert
+    const newTableWithAttr = newTableNode.type.create(
+      { ...newTableNode.attrs, pendingInsert: true },
+      newTableNode.content,
+      newTableNode.marks
+    );
+
+    // Insert after old table
+    tr.insert(newTableInsertPos, newTableWithAttr);
+    return true;
+  })
+  .run();
+```
+
+CSS FILE: src/components/tiptap-node/table-node/table-node.scss
+
+RELEVANT CSS (lines 233-370):
+```scss
+/* Table pending deletion - red styling */
+.ProseMirror table[data-pending-delete="true"],
+.tiptap table[data-pending-delete="true"] {
+  border: 2px solid #EE877B !important;
+  background-color: rgba(238, 135, 123, 0.15) !important;
+  pointer-events: none;
+
+  td, th {
+    background-color: rgba(238, 135, 123, 0.2) !important;
+    border-color: #EE877B !important;
+  }
+
+  th {
+    background-color: rgba(238, 135, 123, 0.35) !important;
+  }
+
+  /* Strikethrough on all text */
+  td p, td span, th p, th span {
+    text-decoration: line-through !important;
+    text-decoration-color: #EE877B !important;
+    color: #c45a4e !important;
+  }
+}
+
+/* Table pending insertion - green styling */
+.ProseMirror table[data-pending-insert="true"],
+.tiptap table[data-pending-insert="true"] {
+  border: 2px solid #22c55e !important;
+  background-color: #D5F6E7 !important;
+  margin-top: 28px;
+
+  &::before {
+    content: 'New table';
+    position: absolute;
+    top: -24px;
+    left: 0;
+    background: #22c55e;
+    color: white;
+    padding: 2px 8px;
+    font-size: 12px;
+  }
+
+  td, th {
+    background-color: #D5F6E7 !important;
+    border-color: #22c55e !important;
+    transition: none !important;
+  }
+
+  th {
+    background-color: #c2f0db !important;
+  }
+
+  /* Prevent hover from changing colors */
+  td:hover { background-color: #D5F6E7 !important; }
+  th:hover { background-color: #c2f0db !important; }
+}
+```
+
+================================================================================
+6. CUSTOM TIPTAP EXTENSIONS
+================================================================================
+
+CustomTable (src/components/tiptap-extension/table-extension.ts):
+
+```typescript
+import Table from '@tiptap/extension-table'
+import { mergeAttributes } from '@tiptap/core'
+
+export const CustomTable = Table.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      pendingDelete: {
+        default: false,
+        parseHTML: element => element.getAttribute('data-pending-delete') === 'true',
+        renderHTML: attributes => {
+          if (!attributes.pendingDelete) return {}
+          return { 'data-pending-delete': 'true' }
+        },
+      },
+      pendingInsert: {
+        default: false,
+        parseHTML: element => element.getAttribute('data-pending-insert') === 'true',
+        renderHTML: attributes => {
+          if (!attributes.pendingInsert) return {}
+          return { 'data-pending-insert': 'true' }
+        },
+      },
+    }
+  },
+
+  renderHTML({ node, HTMLAttributes }) {
+    const attrs: Record<string, string> = {}
+    if (node.attrs.pendingDelete) attrs['data-pending-delete'] = 'true'
+    if (node.attrs.pendingInsert) attrs['data-pending-insert'] = 'true'
+    return ['table', mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, attrs), ['tbody', 0]]
+  },
+})
+```
+
+================================================================================
+7. UNDO/REDO SUPPORT - CRITICAL SECTION
+================================================================================
+
+PROBLEM: After AI generates table changes (red/green tables), pressing Ctrl+Z
+should revert to normal state, but styling persists.
+
+ROOT CAUSE:
+1. DOM attributes (data-pending-delete) were only ADDED, never REMOVED
+2. MutationObserver kept re-applying DOM attributes without checking ProseMirror state
+3. When undo reverts ProseMirror state to pendingDelete: false, DOM wasn't updated
+
+SOLUTION - THREE PARTS:
+
+PART 1: blog-simple-editor.tsx - onTransaction handler (lines 1241-1357)
+
+The sync function must REMOVE DOM attributes when ProseMirror state is false:
+
+```typescript
+onTransaction: ({ editor, transaction }) => {
+  const syncTableAttributes = () => {
+    const { doc } = editor.state;
+
+    doc.descendants((node, pos) => {
+      if (node.type.name === 'table') {
+        const { pendingDelete, pendingInsert } = node.attrs;
+
+        try {
+          const domNode = editor.view.nodeDOM(pos);
+          if (domNode) {
+            const tableElement = domNode instanceof HTMLTableElement
+              ? domNode
+              : (domNode as HTMLElement).querySelector?.('table') || domNode;
+
+            if (tableElement instanceof HTMLElement) {
+              // ADD if true, REMOVE if false (for undo support)
+              if (pendingDelete === true && !tableElement.hasAttribute('data-pending-delete')) {
+                tableElement.setAttribute('data-pending-delete', 'true');
+                tableElement.classList.add('pending-delete-table');
+              } else if (pendingDelete !== true && tableElement.hasAttribute('data-pending-delete')) {
+                // CRITICAL: Remove when ProseMirror says false (supports undo)
+                tableElement.removeAttribute('data-pending-delete');
+                tableElement.classList.remove('pending-delete-table');
+              }
+
+              // Same for pendingInsert
+              if (pendingInsert === true && !tableElement.hasAttribute('data-pending-insert')) {
+                tableElement.setAttribute('data-pending-insert', 'true');
+                tableElement.classList.add('pending-insert-table');
+              } else if (pendingInsert !== true && tableElement.hasAttribute('data-pending-insert')) {
+                tableElement.removeAttribute('data-pending-insert');
+                tableElement.classList.remove('pending-insert-table');
+              }
+            }
+          }
+        } catch (e) { /* ignore */ }
+      }
+      return true;
+    });
+  };
+
+  // Call sync after each transaction
+  requestAnimationFrame(syncTableAttributes);
+}
+```
+
+PART 2: AgentChatPanel.tsx - applyTablePendingAttributes (lines 1729-1801)
+
+MUST check ProseMirror state BEFORE applying DOM attributes:
+
+```typescript
+const applyTablePendingAttributes = () => {
+  // CRITICAL: Check ProseMirror state first - don't blindly apply
+  const { doc } = tableEditor.state;
+  let hasPendingDeleteTable = false;
+  let hasPendingInsertTable = false;
+
+  doc.descendants((node: any) => {
+    if (node.type.name === 'table') {
+      if (node.attrs.pendingDelete === true) hasPendingDeleteTable = true;
+      if (node.attrs.pendingInsert === true) hasPendingInsertTable = true;
+    }
+    return true;
+  });
+
+  // Only apply if ProseMirror state has pending tables
+  // After undo, state will have pendingDelete: false, so we skip
+  if (!hasPendingDeleteTable && !hasPendingInsertTable) {
+    console.log('[TABLE HANDLER] Skipping - no pending tables in ProseMirror (undo?)');
+    return;
+  }
+
+  // ... rest of DOM attribute application
+};
+```
+
+PART 3: BlogEditor.tsx - syncPendingAttributes (lines 2174-2263)
+
+Also syncs on editor update/transaction events:
+
+```typescript
+const syncPendingAttributes = () => {
+  const { doc } = editor.state;
+
+  doc.descendants((node, pos) => {
+    if (node.type.name === 'table') {
+      const { pendingDelete, pendingInsert } = node.attrs;
+
+      try {
+        const domNode = editor.view.nodeDOM(pos);
+        if (domNode) {
+          const tableElement = /* find table element */;
+
+          if (tableElement instanceof HTMLElement) {
+            // Sync pendingDelete: add if true, REMOVE if false
+            if (pendingDelete === true && !tableElement.hasAttribute('data-pending-delete')) {
+              tableElement.setAttribute('data-pending-delete', 'true');
+            } else if (pendingDelete !== true && tableElement.hasAttribute('data-pending-delete')) {
+              tableElement.removeAttribute('data-pending-delete');
+            }
+
+            // Same for pendingInsert
+            if (pendingInsert === true && !tableElement.hasAttribute('data-pending-insert')) {
+              tableElement.setAttribute('data-pending-insert', 'true');
+            } else if (pendingInsert !== true && tableElement.hasAttribute('data-pending-insert')) {
+              tableElement.removeAttribute('data-pending-insert');
+            }
+          }
+        }
+      } catch (e) { /* ignore */ }
+    }
+    return true;
+  });
+};
+
+// Listen to editor events
+editor.on('update', () => debouncedSync());
+editor.on('transaction', () => debouncedSync());
+```
+
+KEY PRINCIPLE:
+- ProseMirror state is the SINGLE SOURCE OF TRUTH
+- DOM attributes must ALWAYS reflect ProseMirror state
+- NEVER blindly re-apply DOM attributes without checking ProseMirror state first
+- When undo changes ProseMirror state, DOM must be updated to match
+
+================================================================================
+8. TABLE BUBBLE MENU BEHAVIOR
+================================================================================
+
+SCENARIO: User clicks inside a table cell
+
+NORMAL STATE:
+- Table bubble menu appears with column/row/cell actions
+
+PENDING STATE (pendingDelete or pendingInsert):
+- Table bubble menu is HIDDEN
+- User cannot modify table during AI review mode
+
+FILE: src/components/tiptap-templates/simple/table-bubble.tsx
+
+RELEVANT CODE (lines 29-45):
+```tsx
+export function TableBubble({ editor }: TableBubbleProps) {
+  if (!editor.isActive('table')) return null;
+
+  const { selection } = editor.state;
+  const { $from } = selection;
+
+  // Find table node and check pending attributes
+  for (let d = $from.depth; d > 0; d--) {
+    const node = $from.node(d);
+    if (node.type.name === 'table') {
+      // Hide bubble if table has pending attributes
+      if (node.attrs.pendingDelete || node.attrs.pendingInsert) {
+        return null;
+      }
+      break;
+    }
+  }
+
+  return (
+    <Toolbar variant="floating">
+      {/* ... toolbar buttons */}
+    </Toolbar>
+  );
+}
+```
+
+================================================================================
+9. DETECTION FLAGS SUMMARY
+================================================================================
+
+isDeletionOnly = !operation.new_content || operation.new_content.trim() === ''
+
+isOldContentImage = old_content contains <img tag
+
+isCodeBlockOperation = old_content contains <pre> or <code> tags
+
+isWholeTableOperation = old_content starts with <table or contains </table>
+
+isTableDeletion = isWholeTableOperation && isDeletionOnly
+
+isTableReplacement = isWholeTableOperation && !isDeletionOnly && new_content contains <table>
+
+isCodeBlockDeletion = isCodeBlockOperation && isDeletionOnly
+
+================================================================================
+10. ACCEPT/REJECT HANDLERS
+================================================================================
+
+Located in: RayoBlogPage.tsx
+
+handleAcceptChanges():
+1. Clean up MutationObserver
+2. Find all nodes with pendingDelete=true -> DELETE them
+3. Find all nodes with pendingInsert=true -> KEEP them (remove flag)
+4. Find all text with red highlight (#fecaca) -> DELETE it
+5. Remove all highlight marks
+6. Save content
+
+handleRejectChanges():
+1. Clean up MutationObserver
+2. Find all nodes with pendingDelete=true -> KEEP them (remove flag)
+3. Find all nodes with pendingInsert=true -> DELETE them
+4. Find all text with green highlight (#c7f0d6ff) -> DELETE it
+5. Remove all highlight marks
+6. Save content
+
+================================================================================
+11. TROUBLESHOOTING GUIDE
+================================================================================
+
+ISSUE: Table red/green styling doesn't appear
+-----------------------------------------
+1. Check if data-pending-delete/data-pending-insert attribute is on table element in DOM
+2. If not, check if ProseMirror state has pendingDelete/pendingInsert: true
+3. If ProseMirror has it but DOM doesn't, sync function isn't working
+4. Check blog-simple-editor.tsx onTransaction handler
+
+ISSUE: Table undo doesn't work (styling persists after Ctrl+Z)
+--------------------------------------------------------------
+1. After undo, check ProseMirror state - does it have pendingDelete: false?
+2. If ProseMirror is false but DOM still has attribute, sync function isn't REMOVING
+3. Check that sync function has the "else if" branch that REMOVES attributes
+4. Check applyTablePendingAttributes - is it checking ProseMirror state first?
+5. If it's blindly re-applying, add the ProseMirror state check
+
+ISSUE: Table bubble menu appears on pending tables
+--------------------------------------------------
+1. Check table-bubble.tsx - is it checking node.attrs.pendingDelete/pendingInsert?
+2. Should return null if either is true
+
+ISSUE: Image pending styling not showing
+----------------------------------------
+1. Check if NodeViewWrapper has the correct class (image-view--pending-insert/delete)
+2. Check resizable-image-node.tsx wrapperClassName
+3. Check resizable-image-node.scss for the CSS rules
+
+ISSUE: Code block pending styling not showing
+---------------------------------------------
+1. Check if <pre> element has data-pending-delete/insert attribute
+2. Check blog-simple-editor.scss for the CSS rules
+
+================================================================================
+12. FILE LOCATIONS QUICK REFERENCE
+================================================================================
+
+MAIN LOGIC:
+- AgentChatPanel.tsx: AI change application logic
+- RayoBlogPage.tsx: Accept/Reject handlers
+- BlogEditor.tsx: Editor wrapper, syncPendingAttributes
+- blog-simple-editor.tsx: TipTap editor, onTransaction sync
+
+TIPTAP EXTENSIONS:
+- src/components/tiptap-extension/table-extension.ts
+- src/components/tiptap-extension/code-block-extension.ts
+- src/components/tiptap-extension/resizable-image-extension.ts
+
+CSS FILES:
+- src/components/tiptap-node/table-node/table-node.scss (table pending styles)
+- src/components/tiptap-node/resizable-image-node/resizable-image-node.scss (image pending styles)
+- src/components/tiptap-templates/simple/blog-simple-editor.scss (code block pending styles)
+
+UI COMPONENTS:
+- src/components/tiptap-templates/simple/table-bubble.tsx (table bubble menu)
+
+================================================================================

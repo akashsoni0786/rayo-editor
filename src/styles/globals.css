@@ -1,0 +1,372 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Intercom Launcher - Force visibility */
+.intercom-launcher,
+.intercom-launcher-frame,
+.intercom-lightweight-app,
+.intercom-lightweight-app-launcher,
+.intercom-namespace,
+#intercom-container,
+.intercom-app {
+  z-index: 2147483647 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+@layer utilities {
+  .bg-shimmer {
+    background-color: #e5e7eb;
+  }
+
+  .animate-shimmer {
+    background-color: #e5e7eb;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+}
+
+h3 {
+  line-height: 1.3;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* DateRangeSelector styles */
+.custom-date-range-picker {
+  border-radius: 10px !important;
+  border-color: #D2D3DB !important;
+  transition: all 0.2s ease !important;
+}
+
+.custom-date-range-picker:hover {
+  border-color: #5E33FF !important;
+  box-shadow: 0 2px 8px rgba(94, 51, 255, 0.08) !important;
+}
+
+.custom-date-range-picker .rs-picker-toggle {
+  background-color: white !important;
+  padding: 8px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.custom-date-range-picker .rs-picker-toggle-active,
+.custom-date-range-picker .rs-picker-toggle:hover {
+  border-color: #5E33FF !important;
+}
+
+.custom-date-range-picker .rs-picker-toggle-textbox {
+  font-size: 14px !important;
+  color: #0E0F11 !important;
+  font-weight: 500 !important;
+}
+
+.custom-date-range-picker .rs-picker-toggle-placeholder {
+  color: #AFB0B6 !important;
+}
+
+/* Calendar header styles */
+.rs-calendar-header-title,
+.rs-calendar-header-backward,
+.rs-calendar-header-forward,
+.rs-calendar-header-btn {
+  color: #0E0F11 !important;
+  font-weight: 500 !important;
+}
+
+.rs-calendar-header {
+  padding: 12px 8px !important;
+}
+
+/* Calendar cell styles */
+.rs-calendar-table-cell-selected .rs-calendar-table-cell-content {
+  background-color: #5E33FF !important;
+  box-shadow: 0 2px 6px rgba(94, 51, 255, 0.25) !important;
+  font-weight: 500 !important;
+}
+
+.rs-calendar-table-cell-in-range::before {
+  background-color: rgba(94, 51, 255, 0.1) !important;
+}
+
+.rs-picker-toolbar-right-btn-ok {
+  background-color: #5E33FF !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+}
+
+.rs-picker-menu .rs-calendar .rs-calendar-table-cell-content:hover {
+  background-color: rgba(94, 51, 255, 0.1) !important;
+}
+
+/* Calendar table styles */
+.rs-calendar-table {
+  margin-top: 8px !important;
+}
+
+.rs-calendar-table-cell-content {
+  border-radius: 8px !important;
+  height: 36px !important;
+  width: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Date picker dropdown menu */
+.rs-picker-menu {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: none !important;
+}
+
+/* Today's date highlight */
+.rs-calendar-table-cell-is-today .rs-calendar-table-cell-content {
+  color: #5E33FF !important;
+  font-weight: 500 !important;
+}
+
+/* Quick selection buttons */
+.rs-picker-toolbar {
+  padding: 0 !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+.quick-select-btn {
+  color: #4285f4 !important;
+  font-size: 14px !important;
+  padding: 8px 16px !important;
+  text-align: left !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.quick-select-btn:hover {
+  background-color: rgba(66, 133, 244, 0.1) !important;
+}
+
+.quick-select-row {
+  display: flex !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Keep existing global styles below */
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}
+
+@keyframes flowingGradient {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes flowingGradientCentered {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* To create a truly continuous flowing effect */
+.continuous-rotate {
+  animation: flowingGradient 3s linear infinite;
+  will-change: transform;
+}
+
+.gradient-border-container-slim,
+.gradient-border-container-slim3,
+.gradient-border-container-slim2,
+.gradient-border-container-slim-auto {
+  position: relative;
+  border-radius: 16px;
+  padding: 1px;
+  overflow: hidden;
+  z-index: 0;
+  box-sizing: border-box;
+}
+
+.gradient-border-container-slim::before {
+  content: '';
+  position: absolute;
+  top: -480%;
+  left: -445%;
+  width: 1000%;
+  height: 1000%;
+  background: conic-gradient(
+    from 0deg,
+    #F1E395, 
+    #8500FF,
+    #5E33FF,
+    #FF5900,
+    #F1E395
+  );
+  animation: flowingGradient 6s linear infinite;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+  z-index: -1;
+  transform-origin: center center;
+}
+.gradient-border-container-slim3::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300%;
+  height: 0;
+  padding-bottom: 300%;
+  background: conic-gradient(
+    from 0deg,
+    #F1E395,
+    #8500FF,
+    #5E33FF,
+    #FF5900,
+    #F1E395
+  );
+  animation: flowingGradientCentered 6s linear infinite;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+  z-index: -1;
+}
+.gradient-border-container-slim2::before {
+    content: '';
+    position: absolute;
+    top: -300%;
+    left: -300%;
+    width: 700%;
+    height: 1000%;
+    background: conic-gradient(
+    from 0deg,
+    #F1E395, 
+    #8500FF,
+    #5E33FF,
+    #FF5900,
+    #F1E395
+  );
+    animation: flowingGradient 6s linear infinite;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
+    z-index: -1;
+    transform-origin: center center;
+}
+.gradient-border-container-slim-auto::before {
+    content: '';
+    position: absolute;
+    top: -206%;
+    left: -451%;
+    width: 1000%;
+    height: 1000%;
+    background: conic-gradient(
+    from 0deg,
+    #F1E395, 
+    #8500FF,
+    #5E33FF,
+    #FF5900,
+    #F1E395
+  );
+    animation: flowingGradient 6s linear infinite;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    will-change: transform;
+    z-index: -1;
+    transform-origin: center center;
+}
+/* Create smoother corners */
+.gradient-border-container-slim-inner {
+  background: white;
+  border-radius: 14px;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+/* For ProjectServices component with smaller radius */
+.gradient-border-container-slim.services-gradient,
+.gradient-border-container-slim-auto.services-gradient {
+  border-radius: 12px;
+  margin-top: 5px;
+}
+
+
+.gradient-border-container-slim.services-gradient::before ,
+.gradient-border-container-slim-auto.services-gradient::before{
+  content: '';
+  position: absolute;
+  top: -350%;
+  left: -400%;
+  width: 900%;
+  height: 900%;
+  background: conic-gradient(
+    from 0deg,
+    #F1E395, 
+    #8500FF,
+    #5E33FF,
+    #FF5900,
+    #F1E395
+  );
+  animation: flowingGradient 6s linear infinite;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+  z-index: -1;
+  transform-origin: center center;
+}
+
+.gradient-border-container-slim.services-gradient .gradient-border-container-slim-inner {
+  border-radius: 10px;
+  background: white;
+}
+
+/* Ripple animation */
+@keyframes ripple {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@layer utilities {
+  .animate-ripple {
+    animation: ripple var(--duration, 2s) ease calc(var(--i, 0) * 0.2s) infinite;
+  }
+}
+

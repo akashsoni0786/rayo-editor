@@ -31,12 +31,12 @@ export function AnimatedToolbarButton({
 }: AnimatedToolbarButtonProps & { ref?: React.Ref<HTMLDivElement> }) {
   const itemRef = React.useRef<HTMLDivElement>(null)
 
-  const mouseDistance = useTransform(mouseX, (val: unknown) => {
+  const mouseDistance = useTransform(mouseX, (val) => {
     const rect = itemRef.current?.getBoundingClientRect()
     if (!rect) return distance + 1 // Default to no effect if no rect
 
     const itemCenterX = rect.x + rect.width / 2
-    return Math.abs((val as number) - itemCenterX)
+    return Math.abs(val - itemCenterX)
   })
 
   const targetScale = useTransform(

@@ -1,0 +1,70 @@
+.skeleton-box {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  overflow: hidden;
+  background-color: #F9D3DF;
+  border-radius: 4px;
+  margin: 0.2em 0;
+}
+
+.skeleton-box {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.editor-skeleton {
+  padding: 2em;
+  height: 100%;
+  background: white;
+}
+
+.blog-post__headline {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-bottom: 1em;
+}
+
+.blog-post__meta {
+  font-size: 0.85em;
+  color: #6b6b6b;
+}
+
+.o-media {
+  display: flex;
+}
+
+.o-media__body {
+  flex-grow: 1;
+}
+
+.o-vertical-spacing > * + * {
+  margin-top: 0.75em;
+}
+
+.o-vertical-spacing--l > * + * {
+  margin-top: 2em;
+}
+
+/* Additional styling for editor context */
+.blog-post {
+  margin-bottom: 2em;
+}
+
+.blog-post p {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.blog-post .skeleton-box {
+  height: 0.9em;
+}
+
+.blog-post__headline .skeleton-box {
+  height: 1.2em;
+}

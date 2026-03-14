@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Editor } from '@tiptap/react';
 import { DOMSerializer } from '@tiptap/pm/model';
@@ -9,7 +8,7 @@ import { IoStopCircleOutline } from "react-icons/io5";
 import { MagicIcon } from '../../tiptap-icons/magic-icon';
 import { Button } from '../../ui/button';
 import { motion, useAnimation } from 'framer-motion';
-import { usePlanRestrictions } from '../../../hooks/usePlanRestrictions';
+// usePlanRestrictions removed - stub values used instead
 
 interface AISelectorProps {
   editor: Editor;
@@ -51,7 +50,8 @@ export const AISelector: React.FC<AISelectorProps> = ({ editor, onOpenChange }) 
   const scrollControls = useAnimation();
   const lastContentLengthRef = React.useRef(0);
   // Get plan restrictions
-  const { isFree, canRetryTitles } = usePlanRestrictions();
+  const isFree = false;
+  const canRetryTitles = true;
 
   // Process streaming completion to ensure valid HTML rendering while preserving live streaming
   React.useEffect(() => {
@@ -386,6 +386,7 @@ export const AISelector: React.FC<AISelectorProps> = ({ editor, onOpenChange }) 
         .insertContent(renderableContent, {
           parseOptions: {
             preserveWhitespace: false,
+            findChildren: true,
           },
           updateSelection: true,
         })
@@ -492,6 +493,7 @@ export const AISelector: React.FC<AISelectorProps> = ({ editor, onOpenChange }) 
         .insertContent(renderableContent, {
           parseOptions: {
             preserveWhitespace: false,
+            findChildren: true,
           },
         })
         .run();
@@ -803,9 +805,7 @@ export const AISelector: React.FC<AISelectorProps> = ({ editor, onOpenChange }) 
                       __html: renderableContent
                     }}
                   />
-                  {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                  {/* @ts-ignore */}
-                  <style>{`
+                  <style jsx>{`
                     .ai-content {
                       color: #000000 !important;
                       transform: translateZ(0); /* Force GPU acceleration */

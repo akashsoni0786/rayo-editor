@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { Editor } from '@tiptap/react'
 import { GripVertical, Plus, Trash2, Copy, Clipboard } from 'lucide-react'

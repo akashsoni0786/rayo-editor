@@ -204,7 +204,6 @@ interface DropdownMenuContentProps
   align?: "start" | "center" | "end"
   portal?: boolean
   portalProps?: Omit<React.ComponentProps<typeof FloatingPortal>, "children">
-  sideOffset?: number
 }
 
 export function DropdownMenuContent({

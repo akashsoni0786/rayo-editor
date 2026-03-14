@@ -58,7 +58,7 @@ function InstagramView({ node, selected }: NodeViewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const _blockquoteRef = useRef<HTMLQuoteElement>(null);
+  const blockquoteRef = useRef<HTMLQuoteElement>(null);
   
   const postUrl = postId ? `https://www.instagram.com/p/${postId}/` : '';
 

@@ -1,6 +1,5 @@
 import * as React from "react"
-import { EditorContent, EditorContext, useEditor, type Editor } from "@tiptap/react"
-import { BubbleMenu } from "./BubbleMenu"
+import { EditorContent, EditorContext, useEditor, BubbleMenu, FloatingMenu, type Editor } from "@tiptap/react"
 import { useMotionValue } from "framer-motion"
 
 // --- Tiptap Core Extensions ---
@@ -860,7 +859,7 @@ const MainToolbarContent = ({
           magnification
         })}
       >
-        <SearchAndReplaceUI editor={editor ?? undefined} />
+        <SearchAndReplaceUI editor={editor} />
       </Group>
 
       <Separator />
@@ -1262,8 +1261,8 @@ export function BlogSimpleEditor({
     content: initialValue,
     onCreate: ({ editor }) => {
       // Calculate ARI score on initial creation
-      if (onAriScoreChange && (editor.storage as any).ariScore) {
-        onAriScoreChange((editor.storage as any).ariScore.score);
+      if (onAriScoreChange && editor.storage.ariScore) {
+        onAriScoreChange(editor.storage.ariScore.score);
       }
     },
     onUpdate: ({ editor }) => {
@@ -1285,7 +1284,7 @@ export function BlogSimpleEditor({
         }
       }
       if (onAriScoreChange) {
-        onAriScoreChange((editor.storage as any).ariScore?.score);
+        onAriScoreChange(editor.storage.ariScore.score);
       }
     },
     // Sync table DOM attributes on any transaction (including undo/redo)

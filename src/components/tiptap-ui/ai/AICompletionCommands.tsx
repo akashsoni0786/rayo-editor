@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Editor } from '@tiptap/react';
 import { Check, TextQuote, Trash2 } from 'lucide-react';

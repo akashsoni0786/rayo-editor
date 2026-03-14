@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useRef, useEffect } from 'react';
 import { Editor } from '@tiptap/react';
 import { Check, Trash } from 'lucide-react';

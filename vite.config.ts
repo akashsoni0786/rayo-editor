@@ -5,6 +5,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react(), dts({ include: ['src'] })],
+  assetsInclude: ['**/*.riv'],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),

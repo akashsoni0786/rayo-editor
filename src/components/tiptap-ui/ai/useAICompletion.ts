@@ -1,7 +1,13 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
-import { tokenManager } from '../../../auth/tokenManager';
+
+// Stub token provider - consumers can override via window.__rayoGetToken
+const getAccessToken = (): string | null => {
+  if (typeof window !== 'undefined' && (window as any).__rayoGetToken) {
+    return (window as any).__rayoGetToken();
+  }
+  return null;
+};
 
 interface UseAICompletionOptions {
   onResponse?: (response: Response) => void;
@@ -66,10 +72,11 @@ export function useAICompletion(options: UseAICompletionOptions = {}) {
     setCompletion('');
 
     try {
-      const tokens = tokenManager.getTokens();
-      if (!tokens?.access_token) {
+      const access_token = getAccessToken();
+      if (!access_token) {
         throw new Error('No access token available. Please log in.');
       }
+      const tokens = { access_token };
 
       // Extract project ID from URL or request data
       const projectId = requestData.body.projectId || window.location.pathname.split('/')[2];

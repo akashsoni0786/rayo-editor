@@ -1,0 +1,116 @@
+/* Use Inter font for simple editor */
+
+// Import TipTap variables and styles
+@use "../styles/variables";
+@use "../styles/keyframe-animations";
+
+body {
+  --tt-toolbar-height: 44px;
+  --tt-theme-text: var(--tt-gray-light-900);
+
+  .dark & {
+    --tt-theme-text: var(--tt-gray-dark-900);
+  }
+}
+
+body {
+  
+  color: var(--tt-theme-text);
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  padding: 0;
+}
+
+html,
+body,
+#root,
+#app {
+  height: 100%;
+  background-color: var(--tt-bg-color);
+}
+
+/* Remove global body overflow hidden - let page scroll naturally */
+/* body {
+  overflow: hidden;
+} */
+
+.tiptap.ProseMirror {
+  
+  font-variant-numeric: slashed-zero;
+  position: relative;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  outline: none;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  /* Cursor styling */
+  caret-color: var(--tt-cursor-color, #3b82f6);
+  
+  /* Selection styling */
+  ::selection {
+    background-color: var(--tt-selection-color, rgba(59, 130, 246, 0.2));
+  }
+}
+
+.simple-editor-container {
+  position: relative;
+  height: 500px; /* Set a fixed height for the editor */
+  min-height: 400px;
+  border: 1px solid var(--tt-border-color, #e5e7eb);
+  border-radius: 8px;
+  background: var(--tt-bg-color, #ffffff);
+}
+
+.content-wrapper {
+  height: calc(100% - var(--tt-toolbar-height)); /* Account for toolbar height */
+  overflow-y: auto;
+  padding-bottom: 0;
+
+  &::-webkit-scrollbar {
+    display: block;
+    width: 0.5rem;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--tt-scrollbar-color, #d1d5db);
+    border-radius: 4px;
+  }
+
+  /* Firefox scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--tt-scrollbar-color, #d1d5db) transparent;
+}
+
+.simple-editor-content {
+  
+  width: 100%;
+  margin: 0 auto;
+}
+
+.simple-editor-content .tiptap.ProseMirror {
+  padding: 3rem 3rem;
+}
+
+@media screen and (max-width: 480px) {
+  .simple-editor-content .tiptap.ProseMirror {
+    padding: 1rem 1rem;
+    /* Add bottom padding to account for fixed toolbar on mobile */
+    padding-bottom: calc(var(--tt-toolbar-height) + 1rem + var(--tt-safe-area-bottom, 0px));
+  }
+  
+  .content-wrapper {
+    /* Adjust content wrapper height on mobile */
+    height: calc(100vh - var(--tt-toolbar-height) - 80px);
+    margin-bottom: calc(var(--tt-toolbar-height) + var(--tt-safe-area-bottom, 0px));
+  }
+}

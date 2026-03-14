@@ -194,7 +194,7 @@ export function getCachedPlanData(): PlanRestrictionResponse | null {
 /**
  * Listen for plan updates and refresh cache
  */
-export function initializePlanUpdateListeners(): (() => void) | void {
+export function initializePlanUpdateListeners(): void {
   // Listen for subscription updates
   const handlePlanUpdate = () => {
     clearPlanCache();

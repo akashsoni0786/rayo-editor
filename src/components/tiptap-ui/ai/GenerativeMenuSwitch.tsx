@@ -1,7 +1,5 @@
-// @ts-nocheck
 import React, { useEffect, Fragment, ReactNode } from 'react';
-import { Editor } from '@tiptap/react';
-import { BubbleMenu } from '../../tiptap-templates/simple/BubbleMenu';
+import { BubbleMenu, Editor } from '@tiptap/react';
 import { Button } from '../../ui/button';
 import { MagicIcon } from '../../tiptap-icons/magic-icon';
 import { AISelector } from './AISelector';
@@ -90,7 +88,7 @@ export const GenerativeMenuSwitch: React.FC<GenerativeMenuSwitchProps> = ({
           onOpenLinkChange?.(false);
         },
       }}
-      shouldShow={({ editor, state, from, to }: any) => {
+      shouldShow={({ editor, state, from, to }) => {
         // CRITICAL: Don't show if editor is in read-only mode
         // This must be first check before anything else
         if (!editor.isEditable) {

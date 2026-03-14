@@ -1,11 +1,7 @@
-// @ts-nocheck
 "use client"
 
 import * as React from "react"
 import { type Editor } from "@tiptap/react"
-// Stub useParams for rayo-editor package (no react-router-dom dependency)
-const useParams = () => ({} as Record<string, string>)
-
 // --- Hooks ---
 import { useTiptapEditor } from "../../../hooks/use-tiptap-editor"
 
@@ -102,8 +98,7 @@ export function ImageUploadButton({
   ...buttonProps
 }: ImageUploadButtonProps & { ref?: React.Ref<HTMLButtonElement> }) {
   const editor = useTiptapEditor(providedEditor)
-  const { id: paramsProjectId } = useParams<{ id: string }>()
-  const projectId = providedProjectId || paramsProjectId
+  const projectId = providedProjectId
 
 
   const {

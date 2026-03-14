@@ -1,0 +1,1 @@
+{"version":3,"file":"tableHandling.d.ts","sourceRoot":"","sources":["../../src/utils/tableHandling.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAEH,OAAO,EAAE,cAAc,EAAE,QAAQ,EAAE,MAAM,qBAAqB,CAAC;AAE/D;;;GAGG;AACH,eAAO,MAAM,sBAAsB,GAAI,QAAQ,cAAc,EAAE,KAAG,cAAc,EAAE,EA0BjF,CAAC;AAEF;;;GAGG;AACH,eAAO,MAAM,sBAAsB,GACjC,WAAW,cAAc,EAAE,EAC3B,YAAY,cAAc,EAAE,KAC3B,QAAQ,EA6CV,CAAC"}

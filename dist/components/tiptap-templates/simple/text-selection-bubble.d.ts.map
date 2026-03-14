@@ -1,0 +1,1 @@
+{"version":3,"file":"text-selection-bubble.d.ts","sourceRoot":"","sources":["../../../../src/components/tiptap-templates/simple/text-selection-bubble.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAA;AAC9B,OAAO,KAAK,EAAE,MAAM,EAAE,MAAM,eAAe,CAAA;AA4B3C,UAAU,wBAAwB;IAChC,MAAM,EAAE,MAAM,CAAA;CACf;AAyBD,eAAO,MAAM,mBAAmB,EAAE,KAAK,CAAC,EAAE,CAAC,wBAAwB,CAyWlE,CAAA"}
