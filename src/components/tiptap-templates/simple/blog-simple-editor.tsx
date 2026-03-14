@@ -115,6 +115,7 @@ import { asBlob } from 'html-docx-js-typescript'
 // --- Components ---
 import { TableBubble } from "./table-bubble"
 import { GenerativeMenuSwitch } from "../../tiptap-ui/ai/GenerativeMenuSwitch"
+import { AIRequestContext } from "../../tiptap-ui/ai/ai-request-context"
 import { TextButtons } from "../../tiptap-ui/ai/TextButtons"
 // Popover removed - using fixed overlay dialog instead (avoids floating-ui bundling issues)
 
@@ -339,6 +340,7 @@ export interface BlogSimpleEditorProps {
   images?: any[];
   isLoadingImages?: boolean;
   onUpload?: (formData: FormData) => Promise<any>;
+  onAIRequest?: (payload: { text: string; option: string; projectId: string; beforeContext?: string; afterContext?: string }) => Promise<Response>;
 }
 
 // Ensure URLs have a protocol prefix so they don't become relative links
@@ -1266,6 +1268,7 @@ export function BlogSimpleEditor({
   images,
   isLoadingImages,
   onUpload,
+  onAIRequest,
 }: BlogSimpleEditorProps & { ref?: React.Ref<BlogSimpleEditorRef> }) {
   // const isMobile = useMobile() // Currently unused
   const toolbarRef = React.useRef<HTMLDivElement>(null)
@@ -2138,8 +2141,9 @@ export function BlogSimpleEditor({
   }, [animated, mouseX, isDragging]);
 
   return (
+    <AIRequestContext.Provider value={{ onAIRequest }}>
     <EditorContext.Provider value={{ editor }}>
-      <div 
+      <div
         className={`blog-simple-editor-container ${className}`}
         style={{ height }}
       >
@@ -2281,5 +2285,6 @@ export function BlogSimpleEditor({
         }))}
       </div>
     </EditorContext.Provider>
+    </AIRequestContext.Provider>
   )
 }

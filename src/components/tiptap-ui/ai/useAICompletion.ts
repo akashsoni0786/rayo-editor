@@ -1,7 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useContext } from 'react';
 import { toast } from 'react-hot-toast';
+import { AIRequestContext } from './ai-request-context';
 
-// Stub token provider - consumers can override via window.__rayoGetToken
+// Fallback token provider - consumers can override via window.__rayoGetToken
 const getAccessToken = (): string | null => {
   if (typeof window !== 'undefined' && (window as any).__rayoGetToken) {
     return (window as any).__rayoGetToken();
@@ -27,6 +28,7 @@ export function useAICompletion(options: UseAICompletionOptions = {}) {
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const { onAIRequest } = useContext(AIRequestContext);
 
   const resetCompletion = () => {
     setCompletion('');
@@ -72,48 +74,47 @@ export function useAICompletion(options: UseAICompletionOptions = {}) {
     setCompletion('');
 
     try {
-      const access_token = getAccessToken();
-      if (!access_token) {
-        throw new Error('No access token available. Please log in.');
-      }
-      const tokens = { access_token };
-
-      // Extract project ID from URL or request data
       const projectId = requestData.body.projectId || window.location.pathname.split('/')[2];
       if (!projectId) {
         throw new Error('Project ID not found. Please navigate to a project.');
       }
 
       const { option, command, beforeContext, afterContext } = requestData.body;
-      const endpoint = getBackendEndpoint(option, projectId);
 
-      // Prepare enhanced request payload with context for backend
-      const payload = {
-        text_to_edit: prompt,
-        primary_keyword: command || '', // Use command as primary_keyword if provided
-        before_context: beforeContext || '', // Context before selected text (max 50 words)
-        after_context: afterContext || '', // Context after selected text (max 50 words)
-      };
+      let response: Response;
 
-      console.log(`🚀 [AI] Making request to: ${endpoint}`);
-      console.log(`📝 [AI] Enhanced Payload with Context:`, {
-        ...payload,
-        contextSummary: {
-          beforeWords: (beforeContext || '').trim().split(/\s+/).filter(w => w.length > 0).length,
-          afterWords: (afterContext || '').trim().split(/\s+/).filter(w => w.length > 0).length,
-          selectedWords: prompt.trim().split(/\s+/).filter(w => w.length > 0).length
+      if (onAIRequest) {
+        // Use callback from Rayo_dev (handles auth + endpoint internally)
+        response = await onAIRequest({
+          text: prompt,
+          option,
+          projectId,
+          beforeContext,
+          afterContext,
+        });
+      } else {
+        // Fallback: direct fetch with window token
+        const access_token = getAccessToken();
+        if (!access_token) {
+          throw new Error('No access token available. Please log in.');
         }
-      });
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${tokens.access_token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
-        },
-        body: JSON.stringify(payload),
-      });
+        const endpoint = getBackendEndpoint(option, projectId);
+        const payload = {
+          text_to_edit: prompt,
+          primary_keyword: command || '',
+          before_context: beforeContext || '',
+          after_context: afterContext || '',
+        };
+        response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${access_token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'text/event-stream',
+          },
+          body: JSON.stringify(payload),
+        });
+      }
 
       if (!response.ok) {
         if (response.status === 429) {

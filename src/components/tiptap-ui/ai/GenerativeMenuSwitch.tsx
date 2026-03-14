@@ -126,14 +126,12 @@ export const GenerativeMenuSwitch: React.FC<GenerativeMenuSwitchProps> = ({
         const text = state.doc.textBetween(from, to, ' ');
         return text.length > 0;
       }}
-      className="flex w-fit max-w-[90vw] overflow-hidden rounded-md shadow-2xl"
+      className="flex w-fit max-w-[90vw] rounded-md shadow-2xl"
       style={{
         background: 'linear-gradient(178deg, #FFF0E8 0%, #F5EAFF 100%)',
-        zIndex: 50, // Match the tippy z-index
+        zIndex: 50,
         position: 'relative',
-        maxWidth: '400px', // Fixed width instead of viewport
-        maxHeight: '300px', // Smaller height
-        overflow: 'auto'
+        maxWidth: '640px',
       }}
     >
       {/* Always show AI selector directly on text selection */}

@@ -48,8 +48,15 @@ export interface BlogSimpleEditorProps {
     images?: any[];
     isLoadingImages?: boolean;
     onUpload?: (formData: FormData) => Promise<any>;
+    onAIRequest?: (payload: {
+        text: string;
+        option: string;
+        projectId: string;
+        beforeContext?: string;
+        afterContext?: string;
+    }) => Promise<Response>;
 }
-export declare function BlogSimpleEditor({ ref, initialValue, onChange, placeholder, readOnly, height, className, onFocus, onBlur, documentTitle, animated, magnification, distance, spring, isStreaming, onAriScoreChange, disableAutoScroll, onUserScrollChange, titleElement, projectId, images, isLoadingImages, onUpload, }: BlogSimpleEditorProps & {
+export declare function BlogSimpleEditor({ ref, initialValue, onChange, placeholder, readOnly, height, className, onFocus, onBlur, documentTitle, animated, magnification, distance, spring, isStreaming, onAriScoreChange, disableAutoScroll, onUserScrollChange, titleElement, projectId, images, isLoadingImages, onUpload, onAIRequest, }: BlogSimpleEditorProps & {
     ref?: React.Ref<BlogSimpleEditorRef>;
 }): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=blog-simple-editor.d.ts.map

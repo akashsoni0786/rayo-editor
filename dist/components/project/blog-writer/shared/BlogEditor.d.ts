@@ -44,6 +44,13 @@ export interface BlogEditorProps {
     images?: any[];
     isLoadingImages?: boolean;
     onUpload?: (formData: FormData) => Promise<any>;
+    onAIRequest?: (payload: {
+        text: string;
+        option: string;
+        projectId: string;
+        beforeContext?: string;
+        afterContext?: string;
+    }) => Promise<Response>;
 }
 declare const BlogEditor: React.FC<BlogEditorProps>;
 export default BlogEditor;
