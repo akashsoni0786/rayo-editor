@@ -25,8 +25,10 @@ export interface ImageGalleryDialogProps {
     isOpen: boolean;
     onClose: () => void;
     onImageSelect?: (image: ProjectImage, options: InsertOptions) => void;
-    projectId: string;
+    images?: ProjectImage[];
+    isLoadingImages?: boolean;
+    onUpload?: (formData: FormData) => Promise<ProjectImage>;
     editor?: Editor | null;
 }
-export default function ImageGalleryDialog({ isOpen, onClose, onImageSelect, projectId, editor }: ImageGalleryDialogProps): import("react/jsx-runtime").JSX.Element;
+export default function ImageGalleryDialog({ isOpen, onClose, onImageSelect, images: propImages, isLoadingImages, onUpload, editor }: ImageGalleryDialogProps): import("react/jsx-runtime").JSX.Element;
 //# sourceMappingURL=ImageGalleryDialog.d.ts.map

@@ -1,15 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Upload, Search, Link as LinkIcon, Loader2, ImageIcon, Grid, 
-  Plus, X, ChevronLeft, ChevronRight, AlertCircle, 
-  Check, Download, Image as LucideImage
+import React, { useState, useEffect } from 'react';
+import {
+  Upload, Search, Loader2, ImageIcon, Grid,
+  AlertCircle, Check, Download, Image as LucideImage
 } from 'lucide-react';
 import { Editor } from '@tiptap/react';
-import axios from 'axios';
-const api = {
-  get: <T = any>(url: string, config?: any) => axios.get<T>(url, config),
-  post: (url: string, data?: any, config?: any) => axios.post(url, data, config),
-};
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
@@ -60,7 +54,9 @@ export interface ImageGalleryDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onImageSelect?: (image: ProjectImage, options: InsertOptions) => void;
-  projectId: string;
+  images?: ProjectImage[];
+  isLoadingImages?: boolean;
+  onUpload?: (formData: FormData) => Promise<ProjectImage>;
   editor?: Editor | null;
 }
 
@@ -137,19 +133,25 @@ export default function ImageGalleryDialog({
   isOpen,
   onClose,
   onImageSelect,
-  projectId,
+  images: propImages = [],
+  isLoadingImages = false,
+  onUpload,
   editor
 }: ImageGalleryDialogProps) {
   // Core State
-  const [images, setImages] = useState<ProjectImage[]>([]);
-  const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ProjectImage | null>(null);
-  
+
+  // Local images list — starts from propImages, new uploads get prepended immediately
+  const [localImages, setLocalImages] = useState<ProjectImage[]>(propImages);
+
+  // Sync when propImages changes (e.g. parent refetches)
+  useEffect(() => {
+    setLocalImages(propImages);
+  }, [propImages]);
+
   // Filter State
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  
+
   // View State
   const [activeTab, setActiveTab] = useState<'gallery' | 'upload'>('gallery');
 
@@ -175,48 +177,20 @@ export default function ImageGalleryDialog({
     altText: ''
   });
 
-  // --- Fetching Logic ---
-
-  const fetchImages = useCallback(async (page = 1, search = '') => {
-    if (!projectId) return;
-    setLoading(true);
-    try {
-      let endpoint = `/api/v1/projects/${projectId}/images`;
-      const params = new URLSearchParams();
-      
-      if (search) {
-        endpoint += '/search';
-        params.append('q', search);
-      }
-      params.append('page', page.toString());
-      params.append('limit', '20');
-      
-      const response = await api.get<ImagesResponse>(`${endpoint}?${params.toString()}`);
-      
-      if (response.data.status === 'success') {
-        setImages(response.data.data.images || []);
-        setTotalPages(response.data.data.pagination?.pages || 1);
-        setCurrentPage(response.data.data.pagination?.page || 1);
-      } else {
-        setImages([]);
-      }
-    } catch (err) {
-      console.error('Error fetching images:', err);
-      setImages([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
+  // Client-side search filter
+  const images = searchQuery
+    ? localImages.filter(img =>
+        img.original_filename.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : localImages;
 
   useEffect(() => {
-    if (isOpen && projectId) {
-      fetchImages();
+    if (isOpen) {
       setSelectedImage(null);
       setSearchQuery('');
-      setCurrentPage(1);
       setActiveTab('gallery');
     }
-  }, [isOpen, projectId, fetchImages]);
+  }, [isOpen]);
 
   // --- Upload Logic ---
 
@@ -227,13 +201,14 @@ export default function ImageGalleryDialog({
   };
 
   const performUpload = async () => {
+    if (!onUpload) return;
     setUploading(true);
     setUploadError(null);
 
     try {
       const formData = new FormData();
       const isUrlUpload = !uploadData.file && !!uploadData.url;
-      
+
       formData.append('category', 'upload');
 
       if (isUrlUpload) {
@@ -244,28 +219,22 @@ export default function ImageGalleryDialog({
         return;
       }
 
-      const response = await api.post(
-        `/api/v1/projects/${projectId}/images/upload`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
+      const uploadedImage = await onUpload(formData);
 
-      if (response.data.status === 'success') {
-        setUploadSuccess(true);
-        await fetchImages(); // Refresh gallery
-        
-        // Success animation delay
-        setTimeout(() => {
-          setUploadSuccess(false);
-          setUploadData({ file: null, url: '' });
-          setActiveTab('gallery');
-          setSelectedImage(response.data.data);
-        }, 1500);
-      }
+      // Add uploaded image to local gallery immediately
+      setLocalImages(prev => [uploadedImage, ...prev]);
+
+      setUploadSuccess(true);
+      setTimeout(() => {
+        setUploadSuccess(false);
+        setUploadData({ file: null, url: '' });
+        setActiveTab('gallery');
+        setSelectedImage(uploadedImage);
+      }, 1500);
     } catch (err: any) {
       setUploadError({
-        message: err.response?.data?.message || 'Upload failed',
-        errors: err.response?.data?.errors || []
+        message: err?.message || 'Upload failed',
+        errors: err?.errors || []
       });
     } finally {
       setUploading(false);
@@ -379,7 +348,7 @@ export default function ImageGalleryDialog({
                       <Input 
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && fetchImages(1, searchQuery)}
+                        onKeyDown={(e) => e.stopPropagation()}
                         placeholder="Search assets..."
                         className="pl-9 w-full bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
                       />
@@ -388,7 +357,7 @@ export default function ImageGalleryDialog({
 
                   {/* Grid */}
                   <div className="flex-1 overflow-y-auto p-6 bg-gray-50/30">
-                    {loading ? (
+                    {isLoadingImages ? (
                       <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                         {Array.from({ length: 10 }).map((_, i) => (
                           <div key={i} className="aspect-[4/3] bg-gray-200/50 rounded-xl animate-pulse" />
@@ -405,7 +374,7 @@ export default function ImageGalleryDialog({
                               setSelectedImage(img);
                               setInsertOptions(prev => ({
                                 ...prev,
-                                width: '100%', // Default to 100% for better editor experience
+                                width: 'auto',
                                 height: 'auto',
                                 altText: img.original_filename
                               }));
@@ -429,26 +398,8 @@ export default function ImageGalleryDialog({
                   {/* Bottom Action Bar (Pagination + Actions) */}
                   <div className="px-6 py-3 border-t border-gray-100 bg-white flex items-center justify-between gap-4">
                     
-                    {/* Pagination - Left */}
-                    <div className="flex items-center gap-4">
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" size="sm" 
-                          disabled={currentPage <= 1}
-                          onClick={() => fetchImages(currentPage - 1, searchQuery)}
-                        >
-                          <ChevronLeft className="w-4 h-4 mr-1" /> Previous
-                        </Button>
-                        <Button 
-                          variant="outline" size="sm"
-                          disabled={currentPage >= totalPages}
-                          onClick={() => fetchImages(currentPage + 1, searchQuery)}
-                        >
-                          Next <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
-                      </div>
-                      <span className="text-sm text-gray-500">Page {currentPage} of {totalPages}</span>
-                    </div>
+                    {/* Image count */}
+                    <span className="text-sm text-gray-500">{images.length} image{images.length !== 1 ? 's' : ''}</span>
 
                     {/* Selection Actions - Right */}
                     <AnimatePresence>

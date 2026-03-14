@@ -41,6 +41,9 @@ export interface BlogEditorProps {
     onEditFeaturedImage?: () => void;
     isGeneratingImage?: boolean;
     projectId?: string;
+    images?: any[];
+    isLoadingImages?: boolean;
+    onUpload?: (formData: FormData) => Promise<any>;
 }
 declare const BlogEditor: React.FC<BlogEditorProps>;
 export default BlogEditor;

@@ -336,6 +336,9 @@ export interface BlogSimpleEditorProps {
   onUserScrollChange?: (isScrolledUp: boolean) => void;
   titleElement?: React.ReactNode;
   projectId?: string; // Pass to enable Media Library image picker
+  images?: any[];
+  isLoadingImages?: boolean;
+  onUpload?: (formData: FormData) => Promise<any>;
 }
 
 // Ensure URLs have a protocol prefix so they don't become relative links
@@ -356,6 +359,9 @@ const MainToolbarContent = ({
   editor,
   documentTitle,
   projectId,
+  images,
+  isLoadingImages,
+  onUpload,
 }: {
   animated?: boolean;
   mouseX?: any;
@@ -366,6 +372,9 @@ const MainToolbarContent = ({
   editor?: Editor | null;
   documentTitle?: string;
   projectId?: string;
+  images?: any[];
+  isLoadingImages?: boolean;
+  onUpload?: (formData: FormData) => Promise<any>;
 }) => {
   const Group = animated ? AnimatedToolbarGroup : ToolbarGroup;
   const Separator = animated ? AnimatedToolbarSeparator : ToolbarSeparator;
@@ -988,7 +997,7 @@ const MainToolbarContent = ({
             <LinkIcon className="tiptap-button-icon" />
           </Button>
         </div>
-        <ImageUploadButton text="Add" editor={editor} projectId={projectId} />
+        <ImageUploadButton text="Add" editor={editor} images={images} isLoadingImages={isLoadingImages} onUpload={onUpload} />
 
         {/* Embed Dropdown (YouTube, Instagram, Twitter) */}
         <div ref={embedButtonRef} style={{ display: 'inline-flex' }}>
@@ -1254,6 +1263,9 @@ export function BlogSimpleEditor({
   onUserScrollChange,
   titleElement,
   projectId,
+  images,
+  isLoadingImages,
+  onUpload,
 }: BlogSimpleEditorProps & { ref?: React.Ref<BlogSimpleEditorRef> }) {
   // const isMobile = useMobile() // Currently unused
   const toolbarRef = React.useRef<HTMLDivElement>(null)
@@ -2263,6 +2275,9 @@ export function BlogSimpleEditor({
           editor,
           documentTitle,
           projectId,
+          images,
+          isLoadingImages,
+          onUpload,
         }))}
       </div>
     </EditorContext.Provider>

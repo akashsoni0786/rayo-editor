@@ -45,6 +45,9 @@ export interface BlogEditorProps {
   isGeneratingImage?: boolean;
   // Pass to enable Media Library image picker in toolbar
   projectId?: string;
+  images?: any[];
+  isLoadingImages?: boolean;
+  onUpload?: (formData: FormData) => Promise<any>;
 }
 
 const DiscardIcon = () => (
@@ -149,6 +152,9 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
   onEditFeaturedImage,
   isGeneratingImage = false,
   projectId,
+  images,
+  isLoadingImages,
+  onUpload,
 }) => {
   const [activeReviewIndex, setActiveReviewIndex] = useState<number>(-1);
   const [diffRanges, setDiffRanges] = useState<{from: number, to: number, rect: {top: number, left: number, width: number, bottom: number, right: number}}[]>([]);
@@ -3993,6 +3999,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
             readOnly={readOnly} isStreaming={Boolean(isStreaming)}
             disableAutoScroll={disableAutoScroll} onUserScrollChange={onUserScrollChange}
             projectId={projectId}
+            images={images} isLoadingImages={isLoadingImages} onUpload={onUpload}
             titleElement={
               <div className="px-8 pt-5 pb-0">
                 {(isGeneratingImage || isStreaming) ? (
