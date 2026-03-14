@@ -1138,7 +1138,6 @@ const MainToolbarContent = ({
             position: 'fixed',
             top: embedPopupPos.top,
             left: embedPopupPos.left,
-            transform: 'translateX(-50%) translateY(-100%)',
             zIndex: 99999,
           }}
           onClick={(e) => e.stopPropagation()}
@@ -1191,7 +1190,6 @@ const MainToolbarContent = ({
             position: 'fixed',
             top: linkPopupPos.top,
             left: linkPopupPos.left,
-            transform: 'translateX(-50%) translateY(-100%)',
             zIndex: 99999,
           }}
           onClick={(e) => e.stopPropagation()}

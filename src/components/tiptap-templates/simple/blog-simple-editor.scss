@@ -1623,6 +1623,14 @@ del[data-diff="deletion"] {
   min-width: 300px;
   max-width: 300px;
   white-space: nowrap;
+  transform: translateX(-50%) translateY(-100%) scale(1);
+  transform-origin: bottom center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateX(-50%) translateY(-100%) scale(1.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  }
 
   // Arrow pointing down toward the toolbar button
   &::after {

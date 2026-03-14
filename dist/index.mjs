@@ -47353,7 +47353,6 @@ const nY = ({ editor: t }) => {
             position: "fixed",
             top: _.top,
             left: _.left,
-            transform: "translateX(-50%) translateY(-100%)",
             zIndex: 99999
           },
           onClick: (pe) => pe.stopPropagation(),
@@ -47411,7 +47410,6 @@ const nY = ({ editor: t }) => {
             position: "fixed",
             top: p.top,
             left: p.left,
-            transform: "translateX(-50%) translateY(-100%)",
             zIndex: 99999
           },
           onClick: (pe) => pe.stopPropagation(),
