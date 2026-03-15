@@ -1221,10 +1221,21 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
         // Save text-only end position BEFORE extending with images
         const textOnlyEnd = textPair.greenRange?.to ?? 0;
 
-        // Extend green range to include all image insertions
+        // Proximity check: only merge images that belong to this text pair's operation.
+        // If an image is far from the text pair's range, it came from a separate operation
+        // and should keep its own standalone button.
+        const spPairStart = Math.min(textPair.redRange?.from ?? Infinity, textPair.greenRange?.from ?? Infinity);
+        const spPairEnd = Math.max(textPair.redRange?.to ?? 0, textPair.greenRange?.to ?? 0);
+        const proximateImgPairs = standaloneImageInsertionPairs.filter(imgPair => {
+          const imgPos = imgPair.greenRange?.from ?? 0;
+          const imgEnd = imgPair.greenRange?.to ?? imgPos;
+          return imgPos >= spPairStart - 10 && imgEnd <= spPairEnd + 10;
+        });
+
+        // Extend green range to include only proximate image insertions
         let combinedGreenFrom = textPair.greenRange?.from ?? Infinity;
         let combinedGreenTo = textPair.greenRange?.to ?? 0;
-        for (const imgPair of standaloneImageInsertionPairs) {
+        for (const imgPair of proximateImgPairs) {
           if (imgPair.greenRange) {
             combinedGreenFrom = Math.min(combinedGreenFrom, imgPair.greenRange.from);
             combinedGreenTo = Math.max(combinedGreenTo, imgPair.greenRange.to);
@@ -1238,7 +1249,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
         let lastElementRect = textPair.lastGreenRect;
         let lastPosition = textOnlyEnd;
         let imageIsLast = false;
-        for (const imgPair of standaloneImageInsertionPairs) {
+        for (const imgPair of proximateImgPairs) {
           const imgEnd = imgPair.greenRange?.to ?? 0;
           if (imgEnd >= lastPosition) {
             lastPosition = imgEnd;
@@ -1247,12 +1258,15 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
           }
         }
         if (lastElementRect) textPair.lastGreenRect = lastElementRect;
-        textPair.includesImageInsertion = true;
-        textPair.imageIsLastInPair = imageIsLast;
+        if (proximateImgPairs.length > 0) {
+          textPair.includesImageInsertion = true;
+          textPair.imageIsLastInPair = imageIsLast;
+        }
 
-        // Remove all standalone image insertion pairs
+        // Remove only proximate image insertion pairs; remote ones stay as standalone operations
+        const proximateImgIndices = new Set(proximateImgPairs.map(ip => pairs.indexOf(ip)));
         for (let i = pairs.length - 1; i >= 0; i--) {
-          if (pairs[i].isImageInsertion && !pairs[i].isImageReplacement) {
+          if (pairs[i].isImageInsertion && !pairs[i].isImageReplacement && proximateImgIndices.has(i)) {
             pairs.splice(i, 1);
           }
         }
@@ -3495,7 +3509,7 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
     setActivePairIndex(nextIndex);
     scrollToPair(nextIndex);
   }, [diffPairs, scrollToPair]);
-
+console.log("diffPairsdiffPairs", diffPairs)
   // Early return for loading state - MUST be after all hooks
   if (isLoading) return <CustomEditorSkeleton />;
 
@@ -4175,12 +4189,13 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
                     const contRect = containerRef.current?.getBoundingClientRect();
                     const borderOffset = bodyEl ? 13 : 0;
                     if (contRect && elRect.height > 0) {
+                      const scrollTop = containerRef.current?.scrollTop || 0;
                       buttonRect = {
-                        top: elRect.top - contRect.top - borderOffset,
+                        top: elRect.top - contRect.top + scrollTop - borderOffset,
                         left: elRect.left - contRect.left - borderOffset,
                         width: elRect.width + borderOffset * 2,
                         right: elRect.left - contRect.left + elRect.width + borderOffset,
-                        bottom: elRect.bottom - contRect.top + borderOffset
+                        bottom: elRect.bottom - contRect.top + scrollTop + borderOffset
                       };
                     }
                   }
@@ -4282,6 +4297,13 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
                 if (targetRange) {
                   const contRect = containerRef.current?.getBoundingClientRect();
                   if (contRect) {
+                    const scrollTop = containerRef.current?.scrollTop || 0;
+                    // For mixed text+image pairs (image in middle, not last), the highlight walk
+                    // is unreliable because text after the image may intermittently lack marks
+                    // due to ProseMirror transaction timing — causing the button to blink between
+                    // above-image and below-image positions. Skip the walk and use range.to directly.
+                    const skipHighlightWalk = pair.includesImageInsertion && !pair.imageIsLastInPair;
+
                     // Walk the ProseMirror doc to find the exact last position that has
                     // a green/red highlight mark. This gives us the true end of the
                     // highlighted content, not the range.to which may include unhighlighted gaps.
@@ -4289,29 +4311,31 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
                     let lastHighlightEnd = -1;
                     let firstHighlightStart = -1;
 
-                    editor.state.doc.nodesBetween(
-                      targetRange.from,
-                      Math.min(targetRange.to, editor.state.doc.content.size),
-                      (node, pos) => {
-                        if (!node.isText) return;
-                        const hasHighlight = node.marks.some(
-                          m => m.type.name === 'highlight' && m.attrs.color === targetColor
-                        );
-                        if (hasHighlight) {
-                          if (firstHighlightStart === -1) firstHighlightStart = pos;
-                          lastHighlightEnd = pos + node.nodeSize;
+                    if (!skipHighlightWalk) {
+                      editor.state.doc.nodesBetween(
+                        targetRange.from,
+                        Math.min(targetRange.to, editor.state.doc.content.size),
+                        (node, pos) => {
+                          if (!node.isText) return;
+                          const hasHighlight = node.marks.some(
+                            m => m.type.name === 'highlight' && m.attrs.color === targetColor
+                          );
+                          if (hasHighlight) {
+                            if (firstHighlightStart === -1) firstHighlightStart = pos;
+                            lastHighlightEnd = pos + node.nodeSize;
+                          }
                         }
-                      }
-                    );
+                      );
+                    }
 
                     if (lastHighlightEnd > 0) {
                       const liveEnd = editor.view.coordsAtPos(Math.min(lastHighlightEnd, editor.state.doc.content.size));
                       const liveStart = editor.view.coordsAtPos(Math.min(firstHighlightStart, editor.state.doc.content.size));
-                      const rawBottom = liveEnd.bottom - contRect.top;
-                      const finalBottom = Math.min(rawBottom, contRect.height - 36);
+                      const rawBottom = liveEnd.bottom - contRect.top + scrollTop;
+                      const finalBottom = Math.min(rawBottom, contRect.height - 36 + scrollTop);
 
                       buttonRect = {
-                        top: liveStart.top - contRect.top,
+                        top: liveStart.top - contRect.top + scrollTop,
                         left: liveStart.left - contRect.left,
                         width: liveEnd.right - liveStart.left,
                         right: liveEnd.right - contRect.left,
@@ -4324,11 +4348,11 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
                         : Math.min(targetRange.to, editor.state.doc.content.size);
                       const liveEnd = editor.view.coordsAtPos(endPos);
                       const liveStart = editor.view.coordsAtPos(Math.min(targetRange.from, editor.state.doc.content.size));
-                      const rawBottom = liveEnd.bottom - contRect.top;
-                      const finalBottom = Math.min(rawBottom, contRect.height - 36);
+                      const rawBottom = liveEnd.bottom - contRect.top + scrollTop;
+                      const finalBottom = Math.min(rawBottom, contRect.height - 36 + scrollTop);
 
                       buttonRect = {
-                        top: liveStart.top - contRect.top,
+                        top: liveStart.top - contRect.top + scrollTop,
                         left: liveStart.left - contRect.left,
                         width: liveEnd.right - liveStart.left,
                         right: liveEnd.right - contRect.left,
