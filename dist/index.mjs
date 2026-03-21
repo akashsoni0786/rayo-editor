@@ -45974,7 +45974,18 @@ function UG({
             tippyOptions: {
               duration: 100,
               placement: "top",
-              maxWidth: "none"
+              maxWidth: "none",
+              popperOptions: {
+                modifiers: [
+                  {
+                    name: "preventOverflow",
+                    options: {
+                      boundary: "viewport",
+                      padding: 8
+                    }
+                  }
+                ]
+              }
             },
             shouldShow: ({ editor: oe }) => {
               if (i || !oe.isActive("table"))
