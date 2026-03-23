@@ -1103,7 +1103,7 @@ To resolve, you may need to:`,"1. Check your network connection","2. Set a new W
           text-decoration: line-through !important;
           text-decoration-color: #EE877B !important;
           color: #EE877B !important;
-          font-weight: 400 !important;
+          font-weight: inherit !important;
           display: inline !important;
         }
 
@@ -1118,7 +1118,8 @@ To resolve, you may need to:`,"1. Check your network connection","2. Set a new W
           text-decoration: none !important;
           padding: 2px 0 !important;
           color: #182234 !important;
-          font-weight: 400 !important;
+          font-weight: inherit !important;
+          font-size: inherit !important;
           display: inline !important;
           box-decoration-break: clone !important;
           -webkit-box-decoration-break: clone !important;
@@ -1168,8 +1169,8 @@ To resolve, you may need to:`,"1. Check your network connection","2. Set a new W
           text-decoration: line-through !important;
           text-decoration-color: #EE877B !important;
           color: #EE877B !important;
-          font-family: Inter !important;
-          font-weight: 400 !important;
+          font-family: inherit !important;
+          font-weight: inherit !important;
           font-size: inherit !important;
           line-height: 140% !important;
           letter-spacing: -0.02em !important;
@@ -1203,7 +1204,7 @@ To resolve, you may need to:`,"1. Check your network connection","2. Set a new W
           text-decoration: none !important;
           padding: 2px 0 !important;
           color: #182234 !important;
-          font-weight: 400 !important;
+          font-weight: inherit !important;
           display: inline !important;
           box-decoration-break: clone !important;
           -webkit-box-decoration-break: clone !important;
@@ -1219,8 +1220,8 @@ To resolve, you may need to:`,"1. Check your network connection","2. Set a new W
           text-decoration: line-through !important;
           text-decoration-color: #EE877B !important;
           color: #EE877B !important;
-          font-family: Inter !important;
-          font-weight: 400 !important;
+          font-family: inherit !important;
+          font-weight: inherit !important;
           font-size: inherit !important;
           line-height: 140% !important;
           letter-spacing: -0.02em !important;
@@ -1233,7 +1234,7 @@ To resolve, you may need to:`,"1. Check your network connection","2. Set a new W
         .review-active-hover .simple-editor-content [style*="background-color: rgb(199, 240, 214)"] {
           background-color: #D5F6E7 !important;
           color: #182234 !important;
-          font-weight: 400 !important;
+          font-weight: inherit !important;
         }
 
         .review-active-hover .simple-editor-content mark[data-color="#fecaca"],
@@ -1296,7 +1297,7 @@ To resolve, you may need to:`,"1. Check your network connection","2. Set a new W
         .review-active-hover .simple-editor-content [style*="background-color: rgb(199, 240, 214)"],
         .review-active-hover .simple-editor-content [style*="background-color:#c7f0d6ff"] {
            color: #182234 !important;
-           font-weight: 400 !important;
+           font-weight: inherit !important;
            opacity: 1 !important;
            filter: none !important;
            visibility: visible !important;
@@ -1333,7 +1334,7 @@ To resolve, you may need to:`,"1. Check your network connection","2. Set a new W
         .review-active-hover [data-active-review="true"] [style*="background-color: rgb(199, 240, 214)"],
         .review-active-hover [data-active-review="true"] [style*="background-color:#c7f0d6ff"] {
            color: #182234 !important;
-           font-weight: 400 !important;
+           font-weight: inherit !important;
            opacity: 1 !important;
            filter: none !important;
            visibility: visible !important;

@@ -82,9 +82,9 @@ div[contenteditable] del {
 /* Special handling for headings with diffs */
 h1 ins, h2 ins, h3 ins, h4 ins, h5 ins, h6 ins,
 h1 del, h2 del, h3 del, h4 del, h5 del, h6 del {
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
 }
 
 /* Animation for diff appearance - disabled to prevent image reload issues */
