@@ -3680,6 +3680,9 @@ console.log("diffPairsdiffPairs", diffPairs)
           text-decoration-color: #EE877B !important;
         }
 
+        /* Code badge diff styling handled via DOM classes (diff-code-red, diff-code-green)
+           applied by syncCodeDiffStyles() — see code-block-node.scss for the CSS rules. */
+
         /* Elevate active/hovered diff marks above the dimming overlay */
         /* EXCLUDE pending-insert and pending-delete tables - they have their own styling */
         .review-pair-hover [data-active-review="true"]:not(table[data-pending-insert="true"]):not(table[data-pending-delete="true"]):not(table.pending-insert-table):not(table.pending-delete-table) {
@@ -4533,6 +4536,14 @@ console.log("diffPairsdiffPairs", diffPairs)
                 ? { from: pair.redRange.from, to: pair.redRange.to }
                 : undefined;
               onAcceptSingleChange(gRange, rRange);
+              // Remove diff-code classes from code badges after marks are cleared
+              setTimeout(() => {
+                const ed = editorRef.current?.getEditor();
+                if (!ed || ed.isDestroyed) return;
+                ed.view.dom.querySelectorAll('code.diff-code-red, code.diff-code-green').forEach(el => {
+                  (el as HTMLElement).classList.remove('diff-code-red', 'diff-code-green');
+                });
+              }, 100);
             }
           };
 
@@ -4552,6 +4563,14 @@ console.log("diffPairsdiffPairs", diffPairs)
                 ? { from: pair.redRange.from, to: pair.redRange.to }
                 : undefined;
               onRejectSingleChange(gRange, rRange);
+              // Remove diff-code classes from code badges after marks are cleared
+              setTimeout(() => {
+                const ed = editorRef.current?.getEditor();
+                if (!ed || ed.isDestroyed) return;
+                ed.view.dom.querySelectorAll('code.diff-code-red, code.diff-code-green').forEach(el => {
+                  (el as HTMLElement).classList.remove('diff-code-red', 'diff-code-green');
+                });
+              }, 100);
             }
           };
 

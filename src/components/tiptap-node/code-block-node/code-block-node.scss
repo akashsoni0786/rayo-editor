@@ -16,6 +16,23 @@
   }
 }
 
+// Diff review: inline code badges styled to match surrounding diff marks
+// Higher specificity than .tiptap.ProseMirror code (0,3,1 vs 0,2,1)
+.tiptap.ProseMirror code.diff-code-red {
+  background-color: transparent !important;
+  color: #EE877B !important;
+  text-decoration: line-through !important;
+  text-decoration-color: #EE877B !important;
+  border-color: rgba(238, 135, 123, 0.3) !important;
+  box-shadow: none !important;
+}
+.tiptap.ProseMirror code.diff-code-green {
+  background-color: rgba(213, 246, 231, 0.6) !important;
+  color: #182234 !important;
+  border-color: rgba(199, 240, 214, 0.8) !important;
+  box-shadow: none !important;
+}
+
 /* =====================
    CODE FORMATTING
    ===================== */
